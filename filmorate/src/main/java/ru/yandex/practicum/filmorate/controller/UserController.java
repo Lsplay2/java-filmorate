@@ -22,6 +22,7 @@ public class UserController {
     private int getId() {
         return ++id;
     }
+
     @GetMapping
     public List<User> getUsers() {
         return new ArrayList<>(users.values());
