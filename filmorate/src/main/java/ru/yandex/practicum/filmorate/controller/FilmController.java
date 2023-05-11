@@ -3,9 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.FilmAlreadyExistException;
-import ru.yandex.practicum.filmorate.exceptions.FilmFildsException;
-import ru.yandex.practicum.filmorate.exceptions.FilmNotExistException;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
@@ -32,11 +30,11 @@ public class FilmController {
     }
 
     @PostMapping
-    public Film createFilm(@RequestBody Film film) throws FilmFildsException {
+    public Film createFilm(@RequestBody Film film) throws ValidationException {
         if (film.getName().isEmpty() || film.getDescription().getBytes().length>200
                 || film.getReleaseDate().isBefore(MIN_DATE) || film.getDuration()<0) {
             log.error("Ошибка в одном из полей фильма");
-            throw new FilmFildsException("Ошибка в одном из полей фильма");
+            throw new ValidationException("Ошибка в одном из полей фильма");
         }
         film.setId(getId());
         films.put(film.getId(), film);
@@ -45,16 +43,16 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film createOrUpdateFilm(@RequestBody Film film) throws FilmNotExistException, FilmFildsException {
+    public Film createOrUpdateFilm(@RequestBody Film film) throws ValidationException {
         if (film.getName().isEmpty() || film.getDescription().getBytes().length>200
                 || film.getReleaseDate().isBefore(MIN_DATE) || film.getDuration()<0) {
             log.error("Ошибка в одном из полей фильма");
-            throw new FilmFildsException("Ошибка в одном из полей фильма");
+            throw new ValidationException("Ошибка в одном из полей фильма");
         }
 
         if(!films.containsKey(film.getId())){
             log.error("Ошибка фильм с таким id не создан");
-            throw new FilmNotExistException("Фильма с таким id не существует");
+            throw new ValidationException("Фильма с таким id не существует");
         }
         films.put(film.getId(), film);
         log.info("Фильм обновлен в коллекции:"+film);
