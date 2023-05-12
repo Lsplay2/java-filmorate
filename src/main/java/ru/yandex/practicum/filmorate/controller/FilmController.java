@@ -16,9 +16,10 @@ import java.util.Map;
 @RequestMapping("/films")
 public class FilmController {
 
+
     private final Logger log = LoggerFactory.getLogger(FilmController.class);
     private final LocalDate minDate = LocalDate.of(1895,12,28);
-    private Map<Integer,Film> films = new HashMap<>();
+    public Map<Integer,Film> films = new HashMap<>();
     private int id = 0;
 
     private int getId() {
@@ -32,7 +33,7 @@ public class FilmController {
 
     @PostMapping
     public Film createFilm(@RequestBody Film film) throws ValidationException {
-        if (film.getName().isEmpty() || film.getDescription().getBytes().length > 200
+        if (film.getName() == null || film.getName().isEmpty() || film.getDescription().getBytes().length > 200
                 || film.getReleaseDate().isBefore(minDate) || film.getDuration() < 0) {
             log.error("Ошибка в одном из полей фильма");
             throw new ValidationException("Ошибка в одном из полей фильма");
@@ -44,8 +45,8 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film createOrUpdateFilm(@RequestBody Film film) throws ValidationException {
-        if (film.getName().isEmpty() || film.getDescription().getBytes().length > 200
+    public Film updateFilm(@RequestBody Film film) throws ValidationException {
+        if (film.getName() == null || film.getName().isEmpty() || film.getDescription().getBytes().length > 200
                 || film.getReleaseDate().isBefore(minDate) || film.getDuration() < 0) {
             log.error("Ошибка в одном из полей фильма");
             throw new ValidationException("Ошибка в одном из полей фильма");
