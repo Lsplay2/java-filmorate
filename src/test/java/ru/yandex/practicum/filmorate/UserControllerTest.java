@@ -44,11 +44,7 @@ public class UserControllerTest {
         user.setLogin("Lsplay");
         user.setEmail("");
         UserController userController = new UserController();
-        try {
-            userController.createUser(user);
-        } catch (ValidationException e) {
-            Assertions.assertEquals("Ошибка в одном из полей пользователя", e.getMessage());
-        }
+        Assertions.assertThrows(ValidationException.class, () -> userController.createUser(user));
         Assertions.assertNotEquals(user,userController.users.get(1));
     }
 
@@ -60,11 +56,7 @@ public class UserControllerTest {
         user.setLogin("Lsplay");
         user.setEmail("qweqwe"); //нет @
         UserController userController = new UserController();
-        try {
-            userController.createUser(user);
-        } catch (ValidationException e) {
-            Assertions.assertEquals("Ошибка в одном из полей пользователя", e.getMessage());
-        }
+        Assertions.assertThrows(ValidationException.class, () -> userController.createUser(user));
         Assertions.assertNotEquals(user,userController.users.get(1));
     }
 
@@ -76,11 +68,7 @@ public class UserControllerTest {
         user.setEmail("qwe@qwe");
         user.setLogin("");
         UserController userController = new UserController();
-        try {
-            userController.createUser(user);
-        } catch (ValidationException e) {
-            Assertions.assertEquals("Ошибка в одном из полей пользователя", e.getMessage());
-        }
+        Assertions.assertThrows(ValidationException.class, () -> userController.createUser(user));
         Assertions.assertNotEquals(user,userController.users.get(1));
     }
 
@@ -92,11 +80,7 @@ public class UserControllerTest {
         user.setLogin("Lsp lay");
         user.setEmail("qweqwe@"); //нет @
         UserController userController = new UserController();
-        try {
-            userController.createUser(user);
-        } catch (ValidationException e) {
-            Assertions.assertEquals("Ошибка в одном из полей пользователя", e.getMessage());
-        }
+        Assertions.assertThrows(ValidationException.class, () -> userController.createUser(user));
         Assertions.assertNotEquals(user,userController.users.get(1));
     }
 
@@ -108,11 +92,7 @@ public class UserControllerTest {
         user.setLogin("Lsplay");
         user.setEmail("qwe@qwe"); //нет @
         UserController userController = new UserController();
-        try {
-            userController.createUser(user);
-        } catch (ValidationException e) {
-            Assertions.assertEquals("Ошибка в одном из полей пользователя", e.getMessage());
-        }
+        Assertions.assertThrows(ValidationException.class, () -> userController.createUser(user));
         Assertions.assertNotEquals(user,userController.users.get(1));
     }
 

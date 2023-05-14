@@ -40,11 +40,7 @@ public class FilmControllerTest {
         film.setDescription("qwe");
         film.setReleaseDate(LocalDate.MAX);
         film.setDuration(120);
-        try {
-            filmController.createFilm(film);
-        } catch (ValidationException e) {
-            Assertions.assertEquals("Ошибка в одном из полей фильма", e.getMessage());
-        }
+        Assertions.assertThrows(ValidationException.class, () -> filmController.createFilm(film));
         Assertions.assertNotEquals(film, filmController.films.get(1));
     }
 
@@ -58,11 +54,7 @@ public class FilmControllerTest {
                 "exerci tation"); //строка в 201 символов
         film.setReleaseDate(LocalDate.MAX);
         film.setDuration(120);
-        try {
-            filmController.createFilm(film);
-        } catch (ValidationException e) {
-            Assertions.assertEquals("Ошибка в одном из полей фильма", e.getMessage());
-        }
+        Assertions.assertThrows(ValidationException.class, () -> filmController.createFilm(film));
         Assertions.assertNotEquals(film, filmController.films.get(1));
     }
 
@@ -88,11 +80,7 @@ public class FilmControllerTest {
         film.setDescription("qwe"); //строка в 201 символов
         film.setReleaseDate(LocalDate.MIN);
         film.setDuration(120);
-        try {
-            filmController.createFilm(film);
-        } catch (ValidationException e) {
-            Assertions.assertEquals("Ошибка в одном из полей фильма", e.getMessage());
-        }
+        Assertions.assertThrows(ValidationException.class, () -> filmController.createFilm(film));
         Assertions.assertNotEquals(film, filmController.films.get(1));
     }
 
@@ -116,11 +104,7 @@ public class FilmControllerTest {
         film.setDescription("qwe"); //строка в 200 символов
         film.setReleaseDate(minDate.minusDays(1));
         film.setDuration(120);
-        try {
-            filmController.createFilm(film);
-        } catch (ValidationException e) {
-            Assertions.assertEquals("Ошибка в одном из полей фильма", e.getMessage());
-        }
+        Assertions.assertThrows(ValidationException.class, () -> filmController.createFilm(film));
         Assertions.assertNotEquals(film, filmController.films.get(1));
     }
 
@@ -132,11 +116,7 @@ public class FilmControllerTest {
         film.setDescription("qwe"); //строка в 201 символов
         film.setReleaseDate(LocalDate.MAX);
         film.setDuration(-100);
-        try {
-            filmController.createFilm(film);
-        } catch (ValidationException e) {
-            Assertions.assertEquals("Ошибка в одном из полей фильма", e.getMessage());
-        }
+        Assertions.assertThrows(ValidationException.class, () -> filmController.createFilm(film));
         Assertions.assertNotEquals(film, filmController.films.get(1));
     }
 

@@ -15,7 +15,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private final Logger log = LoggerFactory.getLogger(UserController.class);
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
     public Map<Integer, User> users = new HashMap<>();
     private int id = 0;
 
@@ -30,8 +30,7 @@ public class UserController {
 
     @PostMapping
     public User createUser(@RequestBody User user) throws ValidationException {
-        if (user.getEmail().isEmpty() || !user.getEmail().contains("@") || user.getLogin().isEmpty()
-                || user.getLogin().contains(" ") || user.getBirthday().isAfter(LocalDate.now())) {
+        if (!validate(user)) {
             log.error("Ошибка в одном из полей пользователя");
             throw new ValidationException("Ошибка в одном из полей пользователя");
         }
@@ -48,9 +47,7 @@ public class UserController {
 
     @PutMapping
     public User createOrUpdateUser(@RequestBody User user) throws ValidationException {
-
-        if (user.getEmail().isEmpty() || !user.getEmail().contains("@") || user.getLogin().isEmpty()
-                || user.getLogin().contains(" ") || user.getBirthday().isAfter(LocalDate.now())) {
+        if (!validate(user)) {
             log.error("Ошибка в одном из полей пользователя");
             throw new ValidationException("Ошибка в одном из полей пользователя");
         }
@@ -66,6 +63,12 @@ public class UserController {
         users.put(user.getId(), user);
         log.info("Пользователь обновлен в коллекции:" + user);
         return user;
+    }
+
+
+    private boolean validate(User user) {
+        return !user.getEmail().isEmpty() && user.getEmail().contains("@") && !user.getLogin().isEmpty()
+                && !user.getLogin().contains(" ") && !user.getBirthday().isAfter(LocalDate.now());
     }
 
 }

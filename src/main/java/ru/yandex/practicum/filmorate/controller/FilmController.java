@@ -17,8 +17,8 @@ import java.util.Map;
 public class FilmController {
 
 
-    private final Logger log = LoggerFactory.getLogger(FilmController.class);
-    private final LocalDate minDate = LocalDate.of(1895,12,28);
+    private static final Logger log = LoggerFactory.getLogger(FilmController.class);
+    private static final LocalDate MIN_DATE = LocalDate.of(1895,12,28);
     public Map<Integer,Film> films = new HashMap<>();
     private int id = 0;
 
@@ -33,8 +33,7 @@ public class FilmController {
 
     @PostMapping
     public Film createFilm(@RequestBody Film film) throws ValidationException {
-        if (film.getName() == null || film.getName().isEmpty() || film.getDescription().getBytes().length > 200
-                || film.getReleaseDate().isBefore(minDate) || film.getDuration() < 0) {
+        if (!validate(film)) {
             log.error("Ошибка в одном из полей фильма");
             throw new ValidationException("Ошибка в одном из полей фильма");
         }
@@ -46,8 +45,7 @@ public class FilmController {
 
     @PutMapping
     public Film updateFilm(@RequestBody Film film) throws ValidationException {
-        if (film.getName() == null || film.getName().isEmpty() || film.getDescription().getBytes().length > 200
-                || film.getReleaseDate().isBefore(minDate) || film.getDuration() < 0) {
+        if (!validate(film)) {
             log.error("Ошибка в одном из полей фильма");
             throw new ValidationException("Ошибка в одном из полей фильма");
         }
@@ -61,4 +59,8 @@ public class FilmController {
         return film;
     }
 
+    private boolean validate(Film film) {
+        return film.getName() != null && !film.getName().isEmpty() && film.getDescription().getBytes().length <= 200
+                && !film.getReleaseDate().isBefore(MIN_DATE) && film.getDuration() >= 0;
+    }
 }
