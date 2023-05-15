@@ -47,7 +47,7 @@ public class UserController {
 
 
     private void validate(User user) throws ValidationException {
-        if(user.getEmail().isEmpty() || !user.getEmail().contains("@") || user.getLogin() == null
+        if (user.getEmail().isEmpty() || !user.getEmail().contains("@") || user.getLogin() == null
                 || user.getLogin().isEmpty() || user.getLogin().contains(" ")
                 || user.getBirthday().isAfter(LocalDate.now())) {
             log.error("Ошибка в одном из полей пользователя");

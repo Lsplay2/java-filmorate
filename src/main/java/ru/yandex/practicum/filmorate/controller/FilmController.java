@@ -51,7 +51,7 @@ public class FilmController {
     }
 
     private boolean validate(Film film) throws ValidationException {
-        if(film.getName() == null || film.getName().isEmpty() || film.getDescription().getBytes().length > 200
+        if (film.getName() == null || film.getName().isEmpty() || film.getDescription().getBytes().length > 200
                 || film.getReleaseDate().isBefore(MIN_DATE) || film.getDuration() < 0) {
             log.error("Ошибка в одном из полей фильма");
             throw new ValidationException("Ошибка в одном из полей фильма");
