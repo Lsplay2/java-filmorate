@@ -33,34 +33,38 @@ public class FilmController {
 
     @PostMapping
     public Film createFilm(@RequestBody Film film) throws ValidationException {
-        if (!validate(film)) {
-            log.error("Ошибка в одном из полей фильма");
-            throw new ValidationException("Ошибка в одном из полей фильма");
-        }
+        validate(film);
         film.setId(getId());
         films.put(film.getId(), film);
         log.info("Фильм добавлен в коллекцию:" + film);
         return film;
+
+
     }
 
     @PutMapping
     public Film updateFilm(@RequestBody Film film) throws ValidationException {
-        if (!validate(film)) {
-            log.error("Ошибка в одном из полей фильма");
-            throw new ValidationException("Ошибка в одном из полей фильма");
-        }
-
-        if (!films.containsKey(film.getId())) {
-            log.error("Ошибка фильм с таким id не создан");
-            throw new ValidationException("Фильма с таким id не существует");
-        }
+        validateOnUpdate(film);
         films.put(film.getId(), film);
         log.info("Фильм обновлен в коллекции:" + film);
         return film;
     }
 
-    private boolean validate(Film film) {
-        return film.getName() != null && !film.getName().isEmpty() && film.getDescription().getBytes().length <= 200
-                && !film.getReleaseDate().isBefore(MIN_DATE) && film.getDuration() >= 0;
+    private boolean validate(Film film) throws ValidationException {
+        if(film.getName() == null || film.getName().isEmpty() || film.getDescription().getBytes().length > 200
+                || film.getReleaseDate().isBefore(MIN_DATE) || film.getDuration() < 0) {
+            log.error("Ошибка в одном из полей фильма");
+            throw new ValidationException("Ошибка в одном из полей фильма");
+        }
+        return true;
+    }
+
+    private boolean validateOnUpdate(Film film) throws ValidationException {
+        validate(film);
+        if (!films.containsKey(film.getId())) {
+            log.error("Ошибка фильм с таким id не создан");
+            throw new ValidationException("Фильма с таким id не существует");
+        }
+        return true;
     }
 }

@@ -30,15 +30,7 @@ public class UserController {
 
     @PostMapping
     public User createUser(@RequestBody User user) throws ValidationException {
-        if (!validate(user)) {
-            log.error("Ошибка в одном из полей пользователя");
-            throw new ValidationException("Ошибка в одном из полей пользователя");
-        }
-        if (user.getName() == null || user.getName().isEmpty()) {
-            log.warn("Имя пользователя не указано. Будет использоваться логин:" + user.getLogin());
-            user.setName(user.getLogin());
-        }
-
+        validateOnCreate(user);
         user.setId(getId());
         users.put(user.getId(), user);
         log.info("Пользователь добавлен в коллекцию:" + user);
@@ -47,28 +39,36 @@ public class UserController {
 
     @PutMapping
     public User createOrUpdateUser(@RequestBody User user) throws ValidationException {
-        if (!validate(user)) {
-            log.error("Ошибка в одном из полей пользователя");
-            throw new ValidationException("Ошибка в одном из полей пользователя");
-        }
-        if (user.getName().isEmpty()) {
-            log.warn("Имя пользователя не указано. Будет использоваться логин:" + user.getLogin());
-            user.setName(user.getLogin());
-        }
-
-        if (!users.containsKey(user.getId())) {
-            log.error("Ошибка фильм с таким id не существует");
-            throw new ValidationException("Фильма с таким id не существует");
-        }
+        validateOnUpdate(user);
         users.put(user.getId(), user);
         log.info("Пользователь обновлен в коллекции:" + user);
         return user;
     }
 
 
-    private boolean validate(User user) {
-        return !user.getEmail().isEmpty() && user.getEmail().contains("@") && !user.getLogin().isEmpty()
-                && !user.getLogin().contains(" ") && !user.getBirthday().isAfter(LocalDate.now());
+    private void validate(User user) throws ValidationException {
+        if(user.getEmail().isEmpty() || !user.getEmail().contains("@") || user.getLogin() == null
+                || user.getLogin().isEmpty() || user.getLogin().contains(" ")
+                || user.getBirthday().isAfter(LocalDate.now())) {
+            log.error("Ошибка в одном из полей пользователя");
+            throw new ValidationException("Ошибка в одном из полей пользователя");
+        }
+    }
+
+    private void validateOnCreate(User user) throws ValidationException {
+        validate(user);
+        if (user.getName() == null || user.getName().isEmpty()) {
+            log.warn("Имя пользователя не указано. Будет использоваться логин:" + user.getLogin());
+            user.setName(user.getLogin());
+        }
+    }
+
+    private void validateOnUpdate(User user) throws ValidationException {
+        validateOnCreate(user);
+        if (!users.containsKey(user.getId())) {
+            log.error("Ошибка фильм с таким id не существует");
+            throw new ValidationException("Фильма с таким id не существует");
+        }
     }
 
 }
