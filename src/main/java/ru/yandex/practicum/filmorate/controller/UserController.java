@@ -21,11 +21,13 @@ import java.util.Map;
 public class UserController {
     public final InMemoryUserStorage userStorage;
     final UserService userService;
+    
     @Autowired
     public UserController(InMemoryUserStorage userStorage, UserService userService) {
         this.userStorage = userStorage;
         this.userService = userService;
     }
+    
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private int id = 0;
 
@@ -43,6 +45,7 @@ public class UserController {
         validateAtGetFriends(id);
         return userStorage.getUserById(id);
     }
+    
     @PostMapping
     public User createUser(@RequestBody User user) throws ValidationException {
         validateOnCreate(user);
@@ -60,6 +63,7 @@ public class UserController {
         log.info("Пользователь обновлен в коллекции:" + user);
         return user;
     }
+    
     @PutMapping(value = "/{id}/friends/{friendId}")
     public User addFriend(@PathVariable int id,
                           @PathVariable int friendId) throws NotFoundException {
@@ -85,8 +89,8 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}/friends/common/{otherId}")
-    public List<User> getAllSameFriends(@PathVariable int id,
-                                        @PathVariable int otherId) throws NotFoundException {
+    public List<User> getAllSameFriends
+        (@PathVariable int id, @PathVariable int otherId) throws NotFoundException {
         validateAtAddOrDelFriends(id, otherId);
         return new ArrayList<>
                 (userService.getSameFriends(userStorage.getUserById(id), userStorage.getUserById(otherId)));
@@ -116,6 +120,7 @@ public class UserController {
         log.error("Ошибка в id пользователя");
         throw new NotFoundException("Ошибка в id пользователя");
     }
+    
     private void validateOnCreate(User user) throws ValidationException {
         validate(user);
         if (user.getName() == null || user.getName().isEmpty()) {
