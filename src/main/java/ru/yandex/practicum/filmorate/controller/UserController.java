@@ -21,13 +21,14 @@ import java.util.Map;
 public class UserController {
     public final InMemoryUserStorage userStorage;
     final UserService userService;
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
+    private int id = 0;
+
     @Autowired
     public UserController(InMemoryUserStorage userStorage, UserService userService) {
         this.userStorage = userStorage;
         this.userService = userService;
     }
-    private static final Logger log = LoggerFactory.getLogger(UserController.class);
-    private int id = 0;
 
     private int getId() {
         return ++id;
