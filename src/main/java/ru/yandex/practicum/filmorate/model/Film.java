@@ -19,6 +19,7 @@ public class Film {
     public void addLike(User user) {
         numOfLike.add(user);
     }
+
     public void delLike(User user) {
         numOfLike.remove(user);
     }
