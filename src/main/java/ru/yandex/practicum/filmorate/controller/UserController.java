@@ -21,13 +21,11 @@ import java.util.Map;
 public class UserController {
     public final InMemoryUserStorage userStorage;
     final UserService userService;
-    
     @Autowired
     public UserController(InMemoryUserStorage userStorage, UserService userService) {
         this.userStorage = userStorage;
         this.userService = userService;
     }
-    
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private int id = 0;
 
@@ -54,7 +52,6 @@ public class UserController {
         log.info("Пользователь добавлен в коллекцию:" + user);
         return user;
     }
-
 
     @PutMapping
     public User createOrUpdateUser(@RequestBody User user) throws ValidationException, NotFoundException {
@@ -89,11 +86,10 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}/friends/common/{otherId}")
-    public List<User> getAllSameFriends
-        (@PathVariable int id, @PathVariable int otherId) throws NotFoundException {
+    public List<User> getAllSameFriends(@PathVariable int id,
+                                        @PathVariable int otherId) throws NotFoundException {
         validateAtAddOrDelFriends(id, otherId);
-        return new ArrayList<>
-                (userService.getSameFriends(userStorage.getUserById(id), userStorage.getUserById(otherId)));
+        return new ArrayList<>(userService.getSameFriends(userStorage.getUserById(id), userStorage.getUserById(otherId)));
     }
 
     private void validate(User user) throws ValidationException {
