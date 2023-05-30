@@ -18,6 +18,7 @@ public class User {
     public void addFriend(int userId) {
         friends.add(userId);
     }
+
     public void delFriend(int userId) {
         friends.remove(userId);
     }
