@@ -9,6 +9,7 @@ import java.util.Map;
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
     private Map<Integer, Film> films = new HashMap<>();
+
     @Override
     public void addFilm(Film film) {
         if (film != null) {
