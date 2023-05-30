@@ -28,7 +28,7 @@ public class FilmService {
     public List<Film> getTopFilm(InMemoryFilmStorage filmStorage, Integer count) {
         List<Film> films = new ArrayList<>(filmStorage.getAllFilms().values());
         return films.stream()
-                .sorted((Comparator.comparing(Film :: getNumberOfLike)).reversed())
+                .sorted((Comparator.comparing(Film::getNumberOfLike)).reversed())
                 .limit(count)
                 .collect(Collectors.toList());
     }
