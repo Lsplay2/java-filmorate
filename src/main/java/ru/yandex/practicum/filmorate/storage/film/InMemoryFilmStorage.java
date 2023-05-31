@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.HashMap;
@@ -10,32 +11,30 @@ import java.util.Map;
 public class InMemoryFilmStorage implements FilmStorage {
     private Map<Integer, Film> films = new HashMap<>();
 
-    @Override
-    public void addFilm(Film film) {
+    public void add(Film film) {
         if (film != null) {
             films.put(film.getId(), film);
         }
     }
 
     @Override
-    public Film getFilmById(int id) {
+    public Film getById(int id) throws NotFoundException {
         if (id != 0) {
             return films.get(id);
         }
-        return new Film();
+        throw new NotFoundException("Такоко id не существует");
     }
 
     @Override
-    public boolean checkFilmInStorage(Film film) {
+    public boolean checkInStorage(Film film) {
         return films.containsValue(film);
     }
 
-    public boolean checkFilmInStorageById(int id) {
+    public boolean checkInStorageById(int id) {
         return films.containsKey(id);
     }
 
-    @Override
-    public Map<Integer, Film> getAllFilms() {
-        return films;
+    public Map<Integer, Film> get() {
+        return new HashMap<>(films);
     }
 }

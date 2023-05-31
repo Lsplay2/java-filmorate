@@ -19,41 +19,46 @@ public class FilmControllerTest {
 
     @Test
     void checkGetAllFilms() {
-        FilmController filmController = new FilmController(new InMemoryFilmStorage(), new FilmService(),
-                new InMemoryUserStorage());
-        filmController.filmStorage.getAllFilms().put(1,new Film());
-        Assertions.assertEquals(1, filmController.getFilms().size());
+        FilmController filmController =
+                new FilmController(new FilmService(new InMemoryFilmStorage(),new InMemoryUserStorage()));
+        Film film = new Film();
+        film.setName("qwe");
+        film.setDescription("qwe");
+        film.setReleaseDate(LocalDate.MAX);
+        film.setDuration(120);
+        filmController.filmService.filmStorage.add(film);
+        Assertions.assertEquals(1, filmController.filmService.filmStorage.get().size());
     }
 
     @Test
     void checkAddFilm() throws ValidationException {
-        FilmController filmController = new FilmController(new InMemoryFilmStorage(), new FilmService(),
-                new InMemoryUserStorage());
+        FilmController filmController =
+                new FilmController(new FilmService(new InMemoryFilmStorage(),new InMemoryUserStorage()));
         Film film = new Film();
         film.setName("qwe");
         film.setDescription("qwe");
         film.setReleaseDate(LocalDate.MAX);
         film.setDuration(120);
         filmController.createFilm(film);
-        Assertions.assertEquals(film, filmController.filmStorage.getAllFilms().get(1));
+        Assertions.assertEquals(film, filmController.filmService.filmStorage.get().get(1));
     }
 
     @Test
     void checkAddFilmFailName() {
-        FilmController filmController = new FilmController(new InMemoryFilmStorage(), new FilmService(),
-                new InMemoryUserStorage());
+        FilmController filmController =
+                new FilmController(new FilmService(new InMemoryFilmStorage(),new InMemoryUserStorage()));
         Film film = new Film();
         film.setDescription("qwe");
         film.setReleaseDate(LocalDate.MAX);
         film.setDuration(120);
         Assertions.assertThrows(ValidationException.class, () -> filmController.createFilm(film));
-        Assertions.assertNotEquals(film, filmController.filmStorage.getAllFilms().get(1));
+        Assertions.assertNotEquals(film, filmController.filmService.filmStorage.get().get(1));
     }
 
     @Test
     void checkAddFilmFailDesctiption() {
-        FilmController filmController = new FilmController(new InMemoryFilmStorage(), new FilmService(),
-                new InMemoryUserStorage());
+        FilmController filmController =
+                new FilmController(new FilmService(new InMemoryFilmStorage(),new InMemoryUserStorage()));
         Film film = new Film();
         film.setName("qwe");
         film.setDescription("Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod " +
@@ -62,13 +67,13 @@ public class FilmControllerTest {
         film.setReleaseDate(LocalDate.MAX);
         film.setDuration(120);
         Assertions.assertThrows(ValidationException.class, () -> filmController.createFilm(film));
-        Assertions.assertNotEquals(film, filmController.filmStorage.getAllFilms().get(1));
+        Assertions.assertNotEquals(film, filmController.filmService.filmStorage.get().get(1));
     }
 
     @Test
     void checkAddFilmDesctiptionWith200Chars() throws ValidationException {
-        FilmController filmController = new FilmController(new InMemoryFilmStorage(), new FilmService(),
-                new InMemoryUserStorage());
+        FilmController filmController =
+                new FilmController(new FilmService(new InMemoryFilmStorage(),new InMemoryUserStorage()));
         Film film = new Film();
         film.setName("qwe");
         film.setDescription("Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod " +
@@ -77,72 +82,72 @@ public class FilmControllerTest {
         film.setReleaseDate(LocalDate.MAX);
         film.setDuration(120);
         filmController.createFilm(film);
-        Assertions.assertEquals(film, filmController.filmStorage.getAllFilms().get(1));
+        Assertions.assertEquals(film, filmController.filmService.filmStorage.get().get(1));
     }
 
     @Test
     void checkAddFilmFailReleaseData() {
-        FilmController filmController = new FilmController(new InMemoryFilmStorage(), new FilmService(),
-                new InMemoryUserStorage());
+        FilmController filmController =
+                new FilmController(new FilmService(new InMemoryFilmStorage(),new InMemoryUserStorage()));
         Film film = new Film();
         film.setName("qwe");
         film.setDescription("qwe"); //строка в 201 символов
         film.setReleaseDate(LocalDate.MIN);
         film.setDuration(120);
         Assertions.assertThrows(ValidationException.class, () -> filmController.createFilm(film));
-        Assertions.assertNotEquals(film, filmController.filmStorage.getAllFilms().get(1));
+        Assertions.assertNotEquals(film, filmController.filmService.filmStorage.get().get(1));
     }
 
     @Test
     void checkAddFilmReleaseDataIsMin() throws ValidationException {
-        FilmController filmController = new FilmController(new InMemoryFilmStorage(), new FilmService(),
-                new InMemoryUserStorage());
+        FilmController filmController =
+                new FilmController(new FilmService(new InMemoryFilmStorage(),new InMemoryUserStorage()));
         Film film = new Film();
         film.setName("qwe");
         film.setDescription("qwe"); //строка в 200 символов
         film.setReleaseDate(minDate);
         film.setDuration(120);
         filmController.createFilm(film);
-        Assertions.assertEquals(film, filmController.filmStorage.getAllFilms().get(1));
+        Assertions.assertEquals(film, filmController.filmService.filmStorage.get().get(1));
     }
 
     @Test
     void checkAddFilmReleaseDataIsMinMinusDay() {
-        FilmController filmController = new FilmController(new InMemoryFilmStorage(), new FilmService(),
-                new InMemoryUserStorage());
+        FilmController filmController =
+                new FilmController(new FilmService(new InMemoryFilmStorage(),new InMemoryUserStorage()));
         Film film = new Film();
         film.setName("qwe");
         film.setDescription("qwe"); //строка в 200 символов
         film.setReleaseDate(minDate.minusDays(1));
         film.setDuration(120);
         Assertions.assertThrows(ValidationException.class, () -> filmController.createFilm(film));
-        Assertions.assertNotEquals(film, filmController.filmStorage.getAllFilms().get(1));
+        Assertions.assertNotEquals(film, filmController.filmService.filmStorage.get().get(1));
     }
 
     @Test
     void checkAddFilmFailDuration() {
-        FilmController filmController = new FilmController(new InMemoryFilmStorage(), new FilmService(),
-                new InMemoryUserStorage());
+        FilmController filmController =
+                new FilmController(new FilmService(new InMemoryFilmStorage(),new InMemoryUserStorage()));
         Film film = new Film();
         film.setName("qwe");
         film.setDescription("qwe"); //строка в 201 символов
         film.setReleaseDate(LocalDate.MAX);
         film.setDuration(-100);
         Assertions.assertThrows(ValidationException.class, () -> filmController.createFilm(film));
-        Assertions.assertNotEquals(film, filmController.filmStorage.getAllFilms().get(1));
+        Assertions.assertNotEquals(film, filmController.filmService.filmStorage.get().get(1));
     }
 
     @Test
     void checkAddFilmDurationIs0() throws ValidationException {
-        FilmController filmController = new FilmController(new InMemoryFilmStorage(), new FilmService(),
-                new InMemoryUserStorage());
+        FilmController filmController =
+                new FilmController(new FilmService(new InMemoryFilmStorage(),new InMemoryUserStorage()));
         Film film = new Film();
         film.setName("qwe");
         film.setDescription("qwe"); //строка в 200 символов
         film.setReleaseDate(LocalDate.MAX);
         film.setDuration(0);
         filmController.createFilm(film);
-        Assertions.assertEquals(film, filmController.filmStorage.getAllFilms().get(1));
+        Assertions.assertEquals(film, filmController.filmService.filmStorage.get().get(1));
     }
 
 }

@@ -11,14 +11,14 @@ public class InMemoryUserStorage implements UserStorage {
     private final Map<Integer, User> users = new HashMap<>();
 
     @Override
-    public void addUser(User user) {
+    public void add(User user) {
         if (user != null) {
             users.put(user.getId(), user);
         }
     }
 
     @Override
-    public User getUserById(int id) {
+    public User getById(int id) {
         if (id != 0) {
             return users.get(id);
         }
@@ -26,16 +26,16 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public boolean checkUserInStorage(User user) {
+    public boolean checkInStorage(User user) {
         return users.containsValue(user);
     }
 
-    public boolean checkUserInStorageById(int id) {
+    public boolean checkInStorageById(int id) {
         return users.containsKey(id);
     }
 
     @Override
-    public Map<Integer, User> getUsers() {
+    public Map<Integer, User> get() {
         return users;
     }
 }
