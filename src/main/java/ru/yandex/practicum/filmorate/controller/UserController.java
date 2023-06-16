@@ -2,22 +2,28 @@ package ru.yandex.practicum.filmorate.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
+
+    public final UserService userService;
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
-    public Map<Integer, User> users = new HashMap<>();
     private int id = 0;
+
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     private int getId() {
         return ++id;
@@ -25,50 +31,63 @@ public class UserController {
 
     @GetMapping
     public List<User> getUsers() {
-        return new ArrayList<>(users.values());
+        return new ArrayList<>(userService.userStorage.get().values());
+    }
+
+    @GetMapping(value = "/{id}")
+    public User getUserById(@PathVariable int id) throws NotFoundException {
+        userService.validateAtGetFriends(id);
+        return userService.userStorage.getById(id);
     }
 
     @PostMapping
     public User createUser(@RequestBody User user) throws ValidationException {
-        validateOnCreate(user);
+        userService.validateOnCreate(user);
         user.setId(getId());
-        users.put(user.getId(), user);
+        userService.userStorage.add(user);
         log.info("Пользователь добавлен в коллекцию:" + user);
         return user;
     }
 
     @PutMapping
-    public User createOrUpdateUser(@RequestBody User user) throws ValidationException {
-        validateOnUpdate(user);
-        users.put(user.getId(), user);
+    public User createOrUpdateUser(@RequestBody User user) throws ValidationException, NotFoundException {
+        userService.validateOnUpdate(user);
+        userService.userStorage.add(user);
         log.info("Пользователь обновлен в коллекции:" + user);
         return user;
     }
 
-
-    private void validate(User user) throws ValidationException {
-        if (user.getEmail().isEmpty() || !user.getEmail().contains("@") || user.getLogin() == null
-                || user.getLogin().isEmpty() || user.getLogin().contains(" ")
-                || user.getBirthday().isAfter(LocalDate.now())) {
-            log.error("Ошибка в одном из полей пользователя");
-            throw new ValidationException("Ошибка в одном из полей пользователя");
-        }
+    @PutMapping(value = "/{id}/friends/{friendId}")
+    public User addFriend(@PathVariable int id,
+                          @PathVariable int friendId) throws NotFoundException {
+        userService.validateAtAddOrDelFriends(id, friendId);
+        userService.addFriend(id, friendId);
+        log.info("Пользователь" + id + " добавил друга:" + friendId);
+        return userService.userStorage.getById(id);
     }
 
-    private void validateOnCreate(User user) throws ValidationException {
-        validate(user);
-        if (user.getName() == null || user.getName().isEmpty()) {
-            log.warn("Имя пользователя не указано. Будет использоваться логин:" + user.getLogin());
-            user.setName(user.getLogin());
-        }
+    @DeleteMapping(value = "/{id}/friends/{friendId}")
+    public User delFriend(@PathVariable int id,
+                          @PathVariable int friendId) throws NotFoundException {
+        userService.validateAtAddOrDelFriends(id, friendId);
+        userService.delFriend(id, friendId);
+        log.info("Пользователь" + id + " удалил из друзей:" + friendId);
+        return userService.userStorage.getById(id);
     }
 
-    private void validateOnUpdate(User user) throws ValidationException {
-        validateOnCreate(user);
-        if (!users.containsKey(user.getId())) {
-            log.error("Ошибка фильм с таким id не существует");
-            throw new ValidationException("Фильма с таким id не существует");
-        }
+    @GetMapping(value = "/{id}/friends")
+    public List<User> getAllFriend(@PathVariable int id) throws NotFoundException {
+        userService.validateAtGetFriends(id);
+        return userService.getFriendList(userService.userStorage.getById(id));
     }
+
+    @GetMapping(value = "/{id}/friends/common/{otherId}")
+    public List<User> getAllSameFriends(@PathVariable int id,
+                                        @PathVariable int otherId) throws NotFoundException {
+        userService.validateAtAddOrDelFriends(id, otherId);
+        return new ArrayList<>(userService.getSameFriends(userService.userStorage.getById(id),
+                userService.userStorage.getById(otherId)));
+    }
+
 
 }

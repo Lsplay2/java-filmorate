@@ -6,6 +6,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.time.LocalDate;
 
@@ -19,9 +21,10 @@ public class UserControllerTest {
         user.setBirthday(LocalDate.now().minusYears(10));
         user.setLogin("Lsplay");
         user.setEmail("qwe@qwe");
-        UserController userController = new UserController();
-        userController.users.put(1, user);
-        Assertions.assertEquals(1,userController.users.size());
+        InMemoryUserStorage userStorage = new InMemoryUserStorage();
+        UserController userController = new UserController(new UserService(userStorage));
+        userController.userService.userStorage.add(user);
+        Assertions.assertEquals(1,userController.userService.userStorage.get().size());
     }
 
     @Test
@@ -31,9 +34,10 @@ public class UserControllerTest {
         user.setBirthday(LocalDate.now().minusYears(10));
         user.setLogin("Lsplay");
         user.setEmail("qwe@qwe");
-        UserController userController = new UserController();
+        InMemoryUserStorage userStorage = new InMemoryUserStorage();
+        UserController userController = new UserController(new UserService(userStorage));
         userController.createUser(user);
-        Assertions.assertEquals(user,userController.users.get(1));
+        Assertions.assertEquals(user,userController.userService.userStorage.get().get(1));
     }
 
     @Test
@@ -43,9 +47,10 @@ public class UserControllerTest {
         user.setBirthday(LocalDate.now().minusYears(10));
         user.setLogin("Lsplay");
         user.setEmail("");
-        UserController userController = new UserController();
+        InMemoryUserStorage userStorage = new InMemoryUserStorage();
+        UserController userController = new UserController(new UserService(userStorage));
         Assertions.assertThrows(ValidationException.class, () -> userController.createUser(user));
-        Assertions.assertNotEquals(user,userController.users.get(1));
+        Assertions.assertNotEquals(user,userController.userService.userStorage.get().get(1));
     }
 
     @Test
@@ -55,9 +60,10 @@ public class UserControllerTest {
         user.setBirthday(LocalDate.now().minusYears(10));
         user.setLogin("Lsplay");
         user.setEmail("qweqwe"); //нет @
-        UserController userController = new UserController();
+        InMemoryUserStorage userStorage = new InMemoryUserStorage();
+        UserController userController = new UserController(new UserService(userStorage));
         Assertions.assertThrows(ValidationException.class, () -> userController.createUser(user));
-        Assertions.assertNotEquals(user,userController.users.get(1));
+        Assertions.assertNotEquals(user,userController.userService.userStorage.get().get(1));
     }
 
     @Test
@@ -67,9 +73,10 @@ public class UserControllerTest {
         user.setBirthday(LocalDate.now().minusYears(10));
         user.setEmail("qwe@qwe");
         user.setLogin("");
-        UserController userController = new UserController();
+        InMemoryUserStorage userStorage = new InMemoryUserStorage();
+        UserController userController = new UserController(new UserService(userStorage));
         Assertions.assertThrows(ValidationException.class, () -> userController.createUser(user));
-        Assertions.assertNotEquals(user,userController.users.get(1));
+        Assertions.assertNotEquals(user,userController.userService.userStorage.get().get(1));
     }
 
     @Test
@@ -79,9 +86,10 @@ public class UserControllerTest {
         user.setBirthday(LocalDate.now().minusDays(1));
         user.setLogin("Lsp lay");
         user.setEmail("qweqwe@"); //нет @
-        UserController userController = new UserController();
+        InMemoryUserStorage userStorage = new InMemoryUserStorage();
+        UserController userController = new UserController(new UserService(userStorage));
         Assertions.assertThrows(ValidationException.class, () -> userController.createUser(user));
-        Assertions.assertNotEquals(user,userController.users.get(1));
+        Assertions.assertNotEquals(user,userController.userService.userStorage.get().get(1));
     }
 
     @Test
@@ -91,9 +99,10 @@ public class UserControllerTest {
         user.setBirthday(LocalDate.now().plusDays(10));
         user.setLogin("Lsplay");
         user.setEmail("qwe@qwe"); //нет @
-        UserController userController = new UserController();
+        InMemoryUserStorage userStorage = new InMemoryUserStorage();
+        UserController userController = new UserController(new UserService(userStorage));
         Assertions.assertThrows(ValidationException.class, () -> userController.createUser(user));
-        Assertions.assertNotEquals(user,userController.users.get(1));
+        Assertions.assertNotEquals(user,userController.userService.userStorage.get().get(1));
     }
 
     @Test
@@ -103,8 +112,9 @@ public class UserControllerTest {
         user.setBirthday(LocalDate.now());
         user.setLogin("Lsplay");
         user.setEmail("qwe@qwe"); //нет @
-        UserController userController = new UserController();
+        InMemoryUserStorage userStorage = new InMemoryUserStorage();
+        UserController userController = new UserController(new UserService(userStorage));
         userController.createUser(user);
-        Assertions.assertEquals(user,userController.users.get(1));
+        Assertions.assertEquals(user,userController.userService.userStorage.get().get(1));
     }
 }
