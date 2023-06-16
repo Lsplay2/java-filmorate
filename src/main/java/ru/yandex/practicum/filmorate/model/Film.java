@@ -14,6 +14,8 @@ public class Film {
     private String description;
     private LocalDate releaseDate;
     private int duration;
+    private Genre genre;
+    private Rating rating;
     private Set<User> numOfLike = new HashSet<>();
 
     public void addLike(User user) {
@@ -28,4 +30,21 @@ public class Film {
         return numOfLike.size();
     }
 
+}
+
+enum Genre {
+    Comedy,
+    Drama,
+    Cartoon,
+    Thriller,
+    Documentary,
+    Action
+}
+
+enum Rating {
+    G,
+    PG,
+    PG13,
+    R,
+    NC17
 }
