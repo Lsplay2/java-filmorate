@@ -31,20 +31,3 @@ public class Film {
     }
 
 }
-
-enum Genre {
-    Comedy,
-    Drama,
-    Cartoon,
-    Thriller,
-    Documentary,
-    Action
-}
-
-enum Rating {
-    G,
-    PG,
-    PG13,
-    R,
-    NC17
-}

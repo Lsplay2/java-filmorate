@@ -32,9 +32,3 @@ public class User {
         friendStatusMap.put(userId, FriendStatus.Confirmed);
     }
 }
-
-enum FriendStatus {
-    Null,
-    Unconfirmed,
-    Confirmed
-}
