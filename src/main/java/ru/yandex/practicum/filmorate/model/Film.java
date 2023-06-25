@@ -41,6 +41,7 @@ public class Film {
             inverseJoinColumns = {
                     @JoinColumn(name = "USER_ID", referencedColumnName = "USER_ID")})
     private Set<User> users = new HashSet<>();
+
     public int getNumOfLike() {
         return numOfLike;
     }

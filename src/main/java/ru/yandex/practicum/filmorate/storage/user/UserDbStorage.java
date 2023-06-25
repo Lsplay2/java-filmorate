@@ -39,6 +39,7 @@ public class UserDbStorage implements UserStorage{
             jdbcTemplate.update(sqlQuerry, user.getId(), user.getName(), user.getEmail(), user.getLogin(), user.getBirthday());
         }
     }
+
     public int getMaxId() {
         String sqlQuery = "select MAX(USER_ID) AS MAX from USERS";
         return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToInt);
@@ -47,6 +48,7 @@ public class UserDbStorage implements UserStorage{
     private int mapRowToInt(ResultSet resultSet, int rowNum) throws SQLException {
         return resultSet.getInt("MAX");
     }
+
     @Override
     public User getById(int id) throws NotFoundException {
         String sqlQuery = "select USER_ID, NAME, EMAIL, LOGIN, BIRTHDAY " +
@@ -101,7 +103,6 @@ public class UserDbStorage implements UserStorage{
         return user;
     }
 
-    //Film_Users
         public void addUserToFilm(int userId, int filmId) {
         String sqlQuerry = "insert into USER_FILM(USER_ID, FILM_ID)" +
                 "values (?, ?)";
@@ -139,7 +140,6 @@ public class UserDbStorage implements UserStorage{
         return resultSet.getInt("FILM_ID");
     }
 
-    //User_friends
     public void addUserToFriend(int userId, int friendId) {
         String sqlQuerry = "insert into USER_FRIEND(USER_ID, FRIEND_ID, CONFIRM)" +
                 "values (?, ?, ?)";

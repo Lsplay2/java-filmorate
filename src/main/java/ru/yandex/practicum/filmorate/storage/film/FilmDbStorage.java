@@ -16,6 +16,7 @@ import java.util.*;
 @Repository
 public class FilmDbStorage implements FilmStorage{
     private final JdbcTemplate jdbcTemplate;
+
     @Autowired
     public FilmDbStorage (JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -62,6 +63,7 @@ public class FilmDbStorage implements FilmStorage{
     private int mapRowToInt(ResultSet resultSet, int rowNum) throws SQLException {
         return resultSet.getInt("MAX");
     }
+
     @Override
     public Film getById (int id) {
         String sqlQuery = "select FILM_ID, NAME, RELEASEDATE, DURATION, DESCRIPTION, RATING_ID " +
@@ -136,7 +138,7 @@ public class FilmDbStorage implements FilmStorage{
         }
         return film;
     }
-    ///Rating
+
     public void createRating (String ratingName) {
         String sqlQuerry = "insert into RATING(NAME)" +
                 "values (?)";
@@ -169,7 +171,6 @@ public class FilmDbStorage implements FilmStorage{
         return rating;
     }
 
-    //Film_user
     private User getUserById (int userId) {
         String sqlQuery = "select USER_ID, NAME, EMAIL, LOGIN, BIRTHDAY " +
                 "from USERS where USER_ID = ?";
@@ -213,7 +214,6 @@ public class FilmDbStorage implements FilmStorage{
         jdbcTemplate.update(sqlQuerry, userId, filmId);
     }
 
-    /// Genre
     public void createGenre (String genreName) {
         String sqlQuerry = "insert into GENRE(NAME)" +
                 "values (?)";
@@ -239,6 +239,7 @@ public class FilmDbStorage implements FilmStorage{
             jdbcTemplate.update(sqlQuerry, genreId, filmId);
         }
     }
+
     private Genre mapRowToGenre (ResultSet resultSet, int rowNum) throws SQLException {
         return Genre.builder()
                 .id(resultSet.getInt("GENRE_ID"))

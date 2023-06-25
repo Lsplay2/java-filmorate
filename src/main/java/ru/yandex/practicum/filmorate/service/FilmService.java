@@ -22,7 +22,6 @@ public class FilmService {
 
     private static final LocalDate MIN_DATE = LocalDate.of(1895,12,28);
     private static final Logger log = LoggerFactory.getLogger(FilmService.class);
-
     public final FilmDbStorage filmStorage;
     public final UserDbStorage userStorage;
 
@@ -60,8 +59,6 @@ public class FilmService {
             throw new NotFoundException("Ошибка в одном из id юзера или фильма");
         }
     }
-
-
 
     public void validate(Film film) throws ValidationException {
         if (film.getName() == null || film.getName().isEmpty() || film.getDescription().getBytes().length > 200
