@@ -13,7 +13,7 @@ import java.sql.SQLException;
 import java.util.*;
 
 @Repository
-public class UserDbStorage implements UserStorage{
+public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
     private final FilmDbStorage filmDbStorage;
 
