@@ -76,28 +76,28 @@ public class FilmService {
         }
     }
 
-    public void validateAddGenre (int filmId, int genreId) throws NotFoundException {
+    public void validateAddGenre(int filmId, int genreId) throws NotFoundException {
         if (!filmStorage.checkInStorageById(filmId) && filmStorage.getGenreById(genreId) == null) {
             log.error("Фильма или жанра нет в базе данных");
             throw new NotFoundException("Фильма или жанра нет в базе данных");
         }
     }
 
-    public void validateAddRating (int filmId, int ratingId) throws NotFoundException {
+    public void validateAddRating(int filmId, int ratingId) throws NotFoundException {
         if (!filmStorage.checkInStorageById(filmId) && filmStorage.getRatingById(ratingId) == null) {
             log.error("Фильма или рейтинга нет в базе данных");
             throw new NotFoundException("Фильма или рейтинга нет в базе данных");
         }
     }
 
-    public void validateGenre (int genreId) throws NotFoundException {
+    public void validateGenre(int genreId) throws NotFoundException {
         if (!filmStorage.checkInStorageGenreById(genreId)) {
             log.error("Жанра нет в базе данных");
             throw new NotFoundException("Жанра нет в базе данных");
         }
     }
 
-    public void validateMPA (int ratingId) throws NotFoundException {
+    public void validateMPA(int ratingId) throws NotFoundException {
         if (!filmStorage.checkInStorageRatingById(ratingId)) {
             log.error("Рейтинга нет в базе данных");
             throw new NotFoundException("Рейтинга нет в базе данных");

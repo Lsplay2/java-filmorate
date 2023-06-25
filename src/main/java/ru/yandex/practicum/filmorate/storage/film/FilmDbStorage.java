@@ -23,7 +23,7 @@ public class FilmDbStorage implements FilmStorage{
     }
 
     @Override
-    public void add (Film film) throws NotFoundException {
+    public void add(Film film) throws NotFoundException {
         if (checkInStorageById(film.getId())) {
             String sqlQuery = "update FILM set " +
                     "NAME = ?, RELEASEDATE = ?, DURATION = ?, DESCRIPTION = ? where FILM_ID = ?";
@@ -65,7 +65,7 @@ public class FilmDbStorage implements FilmStorage{
     }
 
     @Override
-    public Film getById (int id) {
+    public Film getById(int id) {
         String sqlQuery = "select FILM_ID, NAME, RELEASEDATE, DURATION, DESCRIPTION, RATING_ID " +
                 "from FILM where FILM_ID = ?";
         Film film = jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, id);
@@ -73,12 +73,12 @@ public class FilmDbStorage implements FilmStorage{
     }
 
     @Override
-    public boolean checkInStorage (Film some) {
+    public boolean checkInStorage(Film some) {
         return getById(some.getId()) != null;
     }
 
     @Override
-    public Map<Integer, Film> get () {
+    public Map<Integer, Film> get() {
         String sqlQuery = "select FILM_ID, NAME, RELEASEDATE, DURATION, DESCRIPTION, RATING_ID from FILM";
         List<Film> listFilms = jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
         Map<Integer, Film> mapFilms = new HashMap<>();
@@ -88,25 +88,25 @@ public class FilmDbStorage implements FilmStorage{
         return mapFilms;
     }
 
-    public boolean checkInStorageById (int id) {
+    public boolean checkInStorageById(int id) {
         String sqlQuery = "SELECT * FROM FILM WHERE FILM_ID = ?";
         List<Film> listFilms = jdbcTemplate.query(sqlQuery, this::mapRowToFilm, id);
         return listFilms.size() > 0;
     }
 
-    public boolean checkInStorageGenreById (int id) {
+    public boolean checkInStorageGenreById(int id) {
         String sqlQuery = "SELECT * FROM GENRE WHERE GENRE_ID = ?";
         List<Genre> listGenre = jdbcTemplate.query(sqlQuery, this::mapRowToGenre, id);
         return listGenre.size() > 0;
     }
 
-    public boolean checkInStorageRatingById (int id) {
+    public boolean checkInStorageRatingById(int id) {
         String sqlQuery = "SELECT * FROM RATING WHERE RATING_ID = ?";
         List<Rating> listRating = jdbcTemplate.query(sqlQuery, this::mapRowToRating, id);
         return listRating.size() > 0;
     }
 
-    private Film mapRowToFilm (ResultSet resultSet, int rowNum) throws SQLException {
+    private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         Film film = Film.builder()
                 .id(resultSet.getInt("FILM_ID"))
                 .name(resultSet.getString("NAME"))
@@ -139,31 +139,31 @@ public class FilmDbStorage implements FilmStorage{
         return film;
     }
 
-    public void createRating (String ratingName) {
+    public void createRating(String ratingName) {
         String sqlQuerry = "insert into RATING(NAME)" +
                 "values (?)";
         jdbcTemplate.update(sqlQuerry, ratingName);
     }
 
-    public Rating getRatingById (int id) throws NotFoundException {
+    public Rating getRatingById(int id) throws NotFoundException {
         String sqlQuery = "select RATING_ID, NAME " +
                 "from RATING where RATING_ID = ?";
         return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToRating, id);
     }
 
-    public List<Rating> getAllRating () {
+    public List<Rating> getAllRating() {
         String sqlQuery = "select RATING_ID, NAME " +
                 "from RATING";
         return jdbcTemplate.query(sqlQuery, this::mapRowToRating);
     }
 
-    public void addRatingToFilm (int filmId, int ratingId) {
+    public void addRatingToFilm(int filmId, int ratingId) {
         String sqlQuery = "update FILM set " +
                 "RATING_ID = ? where FILM_ID = ?";
         jdbcTemplate.update(sqlQuery, ratingId, filmId);
     }
 
-    private Rating mapRowToRating (ResultSet resultSet, int rowNum) throws SQLException {
+    private Rating mapRowToRating(ResultSet resultSet, int rowNum) throws SQLException {
         Rating rating = Rating.builder()
                 .id(resultSet.getInt("RATING_ID"))
                 .name(resultSet.getString("NAME"))
@@ -171,7 +171,7 @@ public class FilmDbStorage implements FilmStorage{
         return rating;
     }
 
-    private User getUserById (int userId) {
+    private User getUserById(int userId) {
         String sqlQuery = "select USER_ID, NAME, EMAIL, LOGIN, BIRTHDAY " +
                 "from USERS where USER_ID = ?";
         return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, userId);
@@ -188,7 +188,7 @@ public class FilmDbStorage implements FilmStorage{
         return users;
     }
 
-    private User mapRowToUser (ResultSet resultSet, int rowNum) throws SQLException {
+    private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
         return User.builder()
                 .id(resultSet.getInt("USER_ID"))
                 .name(resultSet.getString("NAME"))
@@ -199,7 +199,7 @@ public class FilmDbStorage implements FilmStorage{
 
     }
 
-    private Integer mapRowToUserId (ResultSet resultSet, int rowNum) throws SQLException {
+    private Integer mapRowToUserId(ResultSet resultSet, int rowNum) throws SQLException {
         return resultSet.getInt("USER_ID");
     }
 
@@ -214,19 +214,19 @@ public class FilmDbStorage implements FilmStorage{
         jdbcTemplate.update(sqlQuerry, userId, filmId);
     }
 
-    public void createGenre (String genreName) {
+    public void createGenre(String genreName) {
         String sqlQuerry = "insert into GENRE(NAME)" +
                 "values (?)";
         jdbcTemplate.update(sqlQuerry, genreName);
     }
 
-    public Genre getGenreById (int id) throws NotFoundException {
+    public Genre getGenreById(int id) throws NotFoundException {
         String sqlQuery = "select GENRE_ID, NAME " +
                 "from GENRE where GENRE_ID = ?";
         return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToGenre, id);
     }
 
-    public List<Genre> getAllGenre () {
+    public List<Genre> getAllGenre() {
         String sqlQuery = "select GENRE_ID, NAME " +
                 "from GENRE";
         return jdbcTemplate.query(sqlQuery, this::mapRowToGenre);
@@ -240,14 +240,14 @@ public class FilmDbStorage implements FilmStorage{
         }
     }
 
-    private Genre mapRowToGenre (ResultSet resultSet, int rowNum) throws SQLException {
+    private Genre mapRowToGenre(ResultSet resultSet, int rowNum) throws SQLException {
         return Genre.builder()
                 .id(resultSet.getInt("GENRE_ID"))
                 .name(resultSet.getString("NAME"))
                 .build();
     }
 
-    private Integer mapRowToGenreId (ResultSet resultSet, int rowNum) throws SQLException {
+    private Integer mapRowToGenreId(ResultSet resultSet, int rowNum) throws SQLException {
         return resultSet.getInt("GENRE_ID");
     }
 

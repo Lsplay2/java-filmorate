@@ -18,7 +18,7 @@ public class UserDbStorage implements UserStorage{
     private final FilmDbStorage filmDbStorage;
 
     @Autowired
-    public UserDbStorage (JdbcTemplate jdbcTemplate, FilmDbStorage filmDbStorage) {
+    public UserDbStorage(JdbcTemplate jdbcTemplate, FilmDbStorage filmDbStorage) {
         this.jdbcTemplate = jdbcTemplate;
         this.filmDbStorage = filmDbStorage;
     }
@@ -69,7 +69,7 @@ public class UserDbStorage implements UserStorage{
 
     }
 
-    private Boolean mapRowForCheck (ResultSet resultSet, int rowSet) throws SQLException {
+    private Boolean mapRowForCheck(ResultSet resultSet, int rowSet) throws SQLException {
         return resultSet.getBoolean("CHECK");
     }
 
@@ -84,7 +84,7 @@ public class UserDbStorage implements UserStorage{
         return mapUsers;
     }
 
-    private User mapRowToUser (ResultSet resultSet, int rowNum) throws SQLException {
+    private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
         User user = User.builder()
                 .id(resultSet.getInt("USER_ID"))
                 .name(resultSet.getString("NAME"))
@@ -109,7 +109,7 @@ public class UserDbStorage implements UserStorage{
         jdbcTemplate.update(sqlQuerry, userId, filmId);
     }
 
-    private Film getFilmById (int filmId) {
+    private Film getFilmById(int filmId) {
         String sqlQuery = "select FILM_ID, NAME, RELEASEDATE, DURATION, DESCRIPTION, RATING_ID " +
                 "from FILM where FILM_ID = ?";
         return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, filmId);
@@ -126,7 +126,7 @@ public class UserDbStorage implements UserStorage{
         return films;
     }
 
-    private Film mapRowToFilm (ResultSet resultSet, int rowNum) throws SQLException {
+    private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         return Film.builder()
                  .id(resultSet.getInt("FILM_ID"))
                  .name(resultSet.getString("NAME"))
@@ -136,7 +136,7 @@ public class UserDbStorage implements UserStorage{
                  .build();
     }
 
-    private Integer mapRowToFilmId (ResultSet resultSet, int rowNum) throws SQLException {
+    private Integer mapRowToFilmId(ResultSet resultSet, int rowNum) throws SQLException {
         return resultSet.getInt("FILM_ID");
     }
 
@@ -177,15 +177,15 @@ public class UserDbStorage implements UserStorage{
         return users;
     }
 
-    private Integer mapRowToUserId (ResultSet resultSet, int rowNum) throws SQLException {
+    private Integer mapRowToUserId(ResultSet resultSet, int rowNum) throws SQLException {
         return resultSet.getInt("FRIEND_ID");
     }
 
-    private Integer mapRowToFriendId (ResultSet resultSet, int rowNum) throws SQLException {
+    private Integer mapRowToFriendId(ResultSet resultSet, int rowNum) throws SQLException {
         return resultSet.getInt("USER_ID");
     }
 
-    public List<User> getSame (int userId, int friendId) {
+    public List<User> getSame(int userId, int friendId) {
         List<User> userFriends = findFriendOnUsers(userId);
         List<User> friendFriends = findFriendOnUsers(friendId);
         return checkSame(userFriends,friendFriends);
