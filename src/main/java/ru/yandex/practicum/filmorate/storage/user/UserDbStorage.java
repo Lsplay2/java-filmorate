@@ -147,8 +147,8 @@ public class UserDbStorage implements UserStorage {
     }
 
     public void confirmFriend(int userId, int friendId) {
-        String sqlQuerry = "update USER_FRIEND set CONFIRM = ?";
-        jdbcTemplate.update(sqlQuerry, true);
+        String sqlQuerry = "update USER_FRIEND set CONFIRM = ? WHERE FRIEND_ID = ? AND USER_ID = ?";
+        jdbcTemplate.update(sqlQuerry, true, userId, friendId);
     }
 
     public void delFriendFromUser(int userId, int friendId) {

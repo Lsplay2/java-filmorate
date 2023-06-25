@@ -38,7 +38,7 @@ public class FilmDbStorage implements FilmStorage {
                 jdbcTemplate.update(sqlQuerry, film.getId(), film.getName(),
                         film.getReleaseDate(), film.getDuration(),film.getDescription());
         }
-        if (film.getMpa().getId() != 0) {
+        if (film.getMpa() != null && film.getMpa().getId() != 0) {
             addRatingToFilm(film.getId(),film.getMpa().getId());
         }
         if (film.getGenres() != null) {
