@@ -32,7 +32,7 @@ public class UserDbStorage implements UserStorage{
                     user.getBirthday(), user.getId());
         } else {
             if (user.getId() == 0) {
-                user.setId(getMaxId()+1);
+                user.setId(getMaxId() + 1);
             }
             String sqlQuerry = "insert into USERS(USER_ID, NAME, EMAIL, LOGIN, BIRTHDAY)" +
                     "values (?, ?, ?, ?, ?)";

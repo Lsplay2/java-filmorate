@@ -14,11 +14,11 @@ import java.sql.SQLException;
 import java.util.*;
 
 @Repository
-public class FilmDbStorage implements FilmStorage{
+public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public FilmDbStorage (JdbcTemplate jdbcTemplate) {
+    public FilmDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -31,7 +31,7 @@ public class FilmDbStorage implements FilmStorage{
                     film.getDescription(), film.getId());
         } else {
             if (film.getId() == 0) {
-                film.setId(getMaxId()+1);
+                film.setId(getMaxId() + 1);
             }
                 String sqlQuerry = "insert into FILM(FILM_ID, NAME, RELEASEDATE, DURATION, DESCRIPTION)" +
                         "values (?, ?, ?, ?, ?)";
