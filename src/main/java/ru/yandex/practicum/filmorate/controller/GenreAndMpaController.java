@@ -26,7 +26,7 @@ public class GenreAndMpaController {
 
 
     @GetMapping(value = "/mpa")
-    public List<Rating> getRaing(){
+    public List<Rating> getRaing() {
         return filmService.filmStorage.getAllRating();
     }
 
