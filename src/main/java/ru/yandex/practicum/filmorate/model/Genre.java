@@ -12,6 +12,7 @@ import java.util.Set;
 public class Genre {
     private int id;
     private String name;
+
     @ManyToMany(mappedBy = "GENRE", fetch = FetchType.LAZY)
     private Set<Film> filmList = new HashSet<>();
 }
