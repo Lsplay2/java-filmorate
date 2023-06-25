@@ -191,8 +191,7 @@ public class UserDbStorage implements UserStorage {
         return checkSame(userFriends,friendFriends);
     }
 
-    private static  List<User> checkSame(List<User> first, List<User> second)
-    {
+    private static  List<User> checkSame(List<User> first, List<User> second) {
         List<User> common = new ArrayList<>(first);
         common.retainAll(second);
         return common;
