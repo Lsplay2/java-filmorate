@@ -7,6 +7,7 @@ import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import java.util.HashSet;
 import java.util.Set;
+
 @Data
 @Builder
 public class Genre {
