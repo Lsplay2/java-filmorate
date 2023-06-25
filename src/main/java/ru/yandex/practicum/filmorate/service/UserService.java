@@ -43,8 +43,8 @@ public class UserService {
         return new ArrayList<>();
     }
 
-    public void confirmFriend (int userId, int friendId) {
-        if (userId !=0 && friendId != 0) {
+    public void confirmFriend(int userId, int friendId) {
+        if (userId != 0 && friendId != 0) {
             userStorage.confirmFriend(userId, friendId);
         }
 
