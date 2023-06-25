@@ -7,58 +7,53 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+
 
 @Service
 public class UserService {
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
-    public InMemoryUserStorage userStorage;
+    public UserDbStorage userStorage;
 
     @Autowired
-    public UserService(InMemoryUserStorage userStorage) {
+    public UserService(UserDbStorage userStorage) {
         this.userStorage = userStorage;
     }
 
 
-    public void addFriend(int userId, int friendId) {
+    public void addFriend(int userId, int friendId) throws NotFoundException {
         if (userId != 0 && friendId != 0) {
-            userStorage.getById(userId).addFriend(friendId);
-            userStorage.getById(friendId).addFriend(userId);
+            userStorage.addUserToFriend(userId, friendId);
         }
     }
 
-    public void delFriend(int userId, int friendId) {
+    public void delFriend(int userId, int friendId) throws NotFoundException {
         if (userId != 0 && friendId != 0) {
-            userStorage.getById(userId).addFriend(friendId);
-            userStorage.getById(friendId).addFriend(userId);
+            userStorage.delFriendFromUser(userId, friendId);
         }
     }
 
-    public List<User> getFriendList(User user) {
-        if (user != null) {
-            List<User> friendList = new ArrayList<>();
-            for (int id : user.getFriends()) {
-                friendList.add(userStorage.getById(id));
-            }
-            return friendList;
+    public List<User> getFriendList(int userId) throws NotFoundException {
+        if (userId != 0) {
+            return userStorage.findFriendOnUsers(userId);
         }
         return new ArrayList<>();
     }
 
-    public Set<User> getSameFriends(User user, User friend) {
-        Set<User> sameFriend = new HashSet<>();
-        for (int userFromFirst : user.getFriends()) {
-            if (friend.getFriends().contains(userFromFirst)) {
-                sameFriend.add(userStorage.getById(userFromFirst));
-            }
+    public void confirmFriend (int userId, int friendId) {
+        if (userId !=0 && friendId != 0) {
+            userStorage.confirmFriend(userId, friendId);
         }
-        return sameFriend;
+
+    }
+
+    public List<User> getSameFriends(int userId, int friendId) {
+
+        return userStorage.getSame(userId, friendId);
     }
 
     private void validate(User user) throws ValidationException {

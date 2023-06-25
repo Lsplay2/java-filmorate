@@ -20,15 +20,7 @@ public class FilmController {
 
     @Autowired
     public FilmController(FilmService filmService) {
-
         this.filmService = filmService;
-
-    }
-
-    private int id = 0;
-
-    private int getId() {
-        return ++id;
     }
 
     @GetMapping
@@ -45,20 +37,21 @@ public class FilmController {
     }
 
     @PostMapping
-    public Film createFilm(@RequestBody Film film) throws ValidationException {
+    public Film createFilm(@RequestBody Film film) throws ValidationException, NotFoundException {
         filmService.validate(film);
-        film.setId(getId());
         filmService.filmStorage.add(film);
         log.info("Фильм добавлен в коллекцию:" + film);
-        return film;
+        return filmService.filmStorage.getById(filmService.filmStorage.getMaxId());
     }
+
+
 
     @PutMapping
     public Film updateFilm(@RequestBody Film film) throws ValidationException, NotFoundException {
         filmService.validateOnUpdate(film);
         filmService.filmStorage.add(film);
         log.info("Фильм обновлен в коллекции:" + film);
-        return film;
+        return filmService.filmStorage.getById(film.getId());
     }
 
     @PutMapping(value = "/{id}/like/{userId}")
@@ -66,7 +59,7 @@ public class FilmController {
                         @PathVariable int userId) throws NotFoundException {
         filmService.validateAddAndDelLike(id, userId);
         filmService.addLike(filmService.filmStorage.getById(id), filmService.userStorage.getById(userId));
-        log.info("Лайк добавлен к фильму. Текущее число лайков:" + filmService.filmStorage.getById(id).getNumOfLike().size());
+        log.info("Лайк добавлен к фильму. Текущее число лайков:" + filmService.filmStorage.getById(id).getNumOfLike());
         return filmService.filmStorage.getById(id);
     }
 
@@ -75,15 +68,15 @@ public class FilmController {
                         @PathVariable int userId) throws NotFoundException {
         filmService.validateAddAndDelLike(id, userId);
         filmService.delLike(filmService.filmStorage.getById(id), filmService.userStorage.getById(userId));
-        log.info("Лайк убран у фильма. Текущее число лайков:" + filmService.filmStorage.getById(id).getNumOfLike().size());
+        log.info("Лайк убран у фильма. Текущее число лайков:" + filmService.filmStorage.getById(id).getNumOfLike());
         return filmService.filmStorage.getById(id);
     }
 
     @GetMapping(value = "/popular")
-    public List<Film> getTop(@RequestParam(defaultValue = "10") Integer count) throws ValidationException {
+    public List<Film> getTop(@RequestParam(defaultValue = "10") Integer count){
         if (count <= 0) {
-            return new ArrayList<>(filmService.getTopFilm(filmService.filmStorage, 10));
+           return new ArrayList<>(filmService.getTopFilm(10));
         }
-        return new ArrayList<>(filmService.getTopFilm(filmService.filmStorage, count));
+        return new ArrayList<>(filmService.getTopFilm(count));
     }
 }

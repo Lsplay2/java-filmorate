@@ -8,8 +8,8 @@ import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -23,31 +23,31 @@ public class FilmService {
     private static final LocalDate MIN_DATE = LocalDate.of(1895,12,28);
     private static final Logger log = LoggerFactory.getLogger(FilmService.class);
 
-    public final InMemoryFilmStorage filmStorage;
-    public final InMemoryUserStorage userStorage;
+    public final FilmDbStorage filmStorage;
+    public final UserDbStorage userStorage;
 
     @Autowired
-    public FilmService(InMemoryFilmStorage filmStorage, InMemoryUserStorage userStorage) {
+    public FilmService(FilmDbStorage filmStorage, UserDbStorage userStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
     }
 
     public void addLike(Film film, User user) {
         if (film != null && user != null) {
-            film.addLike(user);
+            filmStorage.addUserToFilm(user.getId(), film.getId());
         }
     }
 
     public void delLike(Film film, User user) {
         if (film != null && user != null) {
-            film.delLike(user);
+            filmStorage.dellUserToFilm(user.getId(), film.getId());
         }
     }
 
-    public List<Film> getTopFilm(InMemoryFilmStorage filmStorage, Integer count) {
+    public List<Film> getTopFilm(Integer count) {
         List<Film> films = new ArrayList<>(filmStorage.get().values());
         return films.stream()
-                .sorted((Comparator.comparing(Film::getNumberOfLike)).reversed())
+                .sorted((Comparator.comparing(Film::getNumOfLike)).reversed())
                 .limit(count)
                 .collect(Collectors.toList());
     }
@@ -66,7 +66,7 @@ public class FilmService {
     public void validate(Film film) throws ValidationException {
         if (film.getName() == null || film.getName().isEmpty() || film.getDescription().getBytes().length > 200
                 || film.getReleaseDate().isBefore(MIN_DATE) || film.getDuration() < 0) {
-            log.error("Ошибка в одном из полcй фильма");
+            log.error("Ошибка в одном из полей фильма");
             throw new ValidationException("Ошибка в одном из полей фильма");
         }
     }
@@ -76,6 +76,34 @@ public class FilmService {
         if (!filmStorage.checkInStorageById(film.getId())) {
             log.error("Ошибка фильм с таким id не создан");
             throw new NotFoundException("Фильма с таким id не существует");
+        }
+    }
+
+    public void validateAddGenre (int filmId, int genreId) throws NotFoundException {
+        if (!filmStorage.checkInStorageById(filmId) && filmStorage.getGenreById(genreId) == null) {
+            log.error("Фильма или жанра нет в базе данных");
+            throw new NotFoundException("Фильма или жанра нет в базе данных");
+        }
+    }
+
+    public void validateAddRating (int filmId, int ratingId) throws NotFoundException {
+        if (!filmStorage.checkInStorageById(filmId) && filmStorage.getRatingById(ratingId) == null) {
+            log.error("Фильма или рейтинга нет в базе данных");
+            throw new NotFoundException("Фильма или рейтинга нет в базе данных");
+        }
+    }
+
+    public void validateGenre (int genreId) throws NotFoundException {
+        if (!filmStorage.checkInStorageGenreById(genreId)) {
+            log.error("Жанра нет в базе данных");
+            throw new NotFoundException("Жанра нет в базе данных");
+        }
+    }
+
+    public void validateMPA (int ratingId) throws NotFoundException {
+        if (!filmStorage.checkInStorageRatingById(ratingId)) {
+            log.error("Рейтинга нет в базе данных");
+            throw new NotFoundException("Рейтинга нет в базе данных");
         }
     }
 }

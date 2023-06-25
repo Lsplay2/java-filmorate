@@ -1,13 +1,13 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.Builder;
 import lombok.Data;
 
+import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-
+@Builder
 @Data
 public class User {
     private int id;
@@ -15,20 +15,16 @@ public class User {
     private String login;
     private String name;
     private LocalDate birthday;
-    private Set<Integer> friends = new HashSet<>();
-    private Map<Integer, FriendStatus> friendStatusMap = new HashMap<>();
 
-    public void addFriend(int userId) {
-        friends.add(userId);
-        friendStatusMap.put(userId, FriendStatus.Unconfirmed);
-    }
+    @ManyToMany(mappedBy = "USERS", fetch = FetchType.LAZY)
+    public Set<Film> films = new HashSet<>();
 
-    public void delFriend(int userId) {
-        friends.remove(userId);
-        friendStatusMap.remove(userId);
-    }
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinTable(name = "USER_FRIEND",
+            joinColumns = {
+                    @JoinColumn(name = "FRIEND_ID", referencedColumnName = "USER_ID")},
+            inverseJoinColumns = {
+                    @JoinColumn(name = "USER_ID", referencedColumnName = "USER_ID")})
+    private Set<User> friends = new HashSet<User>();
 
-    public void confirmFriend(int userId) {
-        friendStatusMap.put(userId, FriendStatus.Confirmed);
-    }
 }
