@@ -21,7 +21,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-class FilmoRateApplicationTests {
+class FilmorateApplicationTests {
 	private final UserDbStorage userStorage;
 	private final FilmDbStorage filmStorage;
 
@@ -73,6 +73,7 @@ class FilmoRateApplicationTests {
 						assertThat(user).hasFieldOrPropertyWithValue("name", "zzz")
 				);
 	}
+
 	@Test
 	public void testAddFriend() throws NotFoundException {
 		userStorage.add(User.builder().name("qwe").id(1).login("Lsplay")
@@ -125,7 +126,7 @@ class FilmoRateApplicationTests {
 		Optional<Integer> userOptional2 = Optional.of(userList2.size());
 		assertThat(userOptional2)
 				.isPresent()
-				.hasValue( 0 );
+				.hasValue(0);
 	}
 
 	@Test
