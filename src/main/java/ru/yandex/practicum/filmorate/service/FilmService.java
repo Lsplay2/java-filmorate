@@ -22,8 +22,8 @@ public class FilmService {
 
     private static final LocalDate MIN_DATE = LocalDate.of(1895,12,28);
     private static final Logger log = LoggerFactory.getLogger(FilmService.class);
-    public final FilmDbStorage filmStorage;
-    public final UserDbStorage userStorage;
+    private final FilmDbStorage filmStorage;
+    private final UserDbStorage userStorage;
 
     @Autowired
     public FilmService(FilmDbStorage filmStorage, UserDbStorage userStorage) {
@@ -31,15 +31,42 @@ public class FilmService {
         this.userStorage = userStorage;
     }
 
-    public void addLike(Film film, User user) {
-        if (film != null && user != null) {
-            filmStorage.addUserToFilm(user.getId(), film.getId());
+    public Film getById(int id) throws NotFoundException {
+        if(filmStorage.checkInStorageById(id)) {
+            return filmStorage.getById(id);
+        }
+        throw new NotFoundException("Фильм не найден");
+    }
+
+    public List<Film> getAll() throws NotFoundException {
+        return new ArrayList<>(filmStorage.get().values());
+    }
+
+    public Film createFilm(Film film) throws ValidationException, NotFoundException {
+        validate(film);
+        filmStorage.add(film);
+        return filmStorage.getById(filmStorage.getMaxId());
+    }
+
+    public Film updateFilm(Film film) throws ValidationException, NotFoundException {
+        validateOnUpdate(film);
+        filmStorage.add(film);
+        return filmStorage.getById(film.getId());
+    }
+
+    public void addLike(int filmId, int userId) throws NotFoundException {
+        validateAddAndDelLike(filmId, userId);
+        if (filmStorage.checkInStorageById(filmId)
+                && userStorage.checkInStorageById(userId)) {
+            filmStorage.addUserToFilm(userId, filmId);
         }
     }
 
-    public void delLike(Film film, User user) {
-        if (film != null && user != null) {
-            filmStorage.dellUserToFilm(user.getId(), film.getId());
+    public void delLike(int filmId, int userId) throws NotFoundException {
+        validateAddAndDelLike(filmId, userId);
+        if (filmStorage.checkInStorageById(filmId)
+                && userStorage.checkInStorageById(userId)) {
+            filmStorage.dellUserToFilm(userId, filmId);
         }
     }
 
@@ -51,7 +78,7 @@ public class FilmService {
                 .collect(Collectors.toList());
     }
 
-    public void validateAddAndDelLike(int filmId, int userId) throws NotFoundException {
+    private void validateAddAndDelLike(int filmId, int userId) throws NotFoundException {
         if (filmStorage.checkInStorageById(filmId) && userStorage.checkInStorageById(userId)) {
             return;
         } else {
@@ -60,7 +87,7 @@ public class FilmService {
         }
     }
 
-    public void validate(Film film) throws ValidationException {
+    private void validate(Film film) throws ValidationException {
         if (film.getName() == null || film.getName().isEmpty() || film.getDescription().getBytes().length > 200
                 || film.getReleaseDate().isBefore(MIN_DATE) || film.getDuration() < 0) {
             log.error("Ошибка в одном из полей фильма");
@@ -68,39 +95,11 @@ public class FilmService {
         }
     }
 
-    public void validateOnUpdate(Film film) throws NotFoundException, ValidationException {
+    private void validateOnUpdate(Film film) throws NotFoundException, ValidationException {
         validate(film);
         if (!filmStorage.checkInStorageById(film.getId())) {
             log.error("Ошибка фильм с таким id не создан");
             throw new NotFoundException("Фильма с таким id не существует");
-        }
-    }
-
-    public void validateAddGenre(int filmId, int genreId) throws NotFoundException {
-        if (!filmStorage.checkInStorageById(filmId) && filmStorage.getGenreById(genreId) == null) {
-            log.error("Фильма или жанра нет в базе данных");
-            throw new NotFoundException("Фильма или жанра нет в базе данных");
-        }
-    }
-
-    public void validateAddRating(int filmId, int ratingId) throws NotFoundException {
-        if (!filmStorage.checkInStorageById(filmId) && filmStorage.getRatingById(ratingId) == null) {
-            log.error("Фильма или рейтинга нет в базе данных");
-            throw new NotFoundException("Фильма или рейтинга нет в базе данных");
-        }
-    }
-
-    public void validateGenre(int genreId) throws NotFoundException {
-        if (!filmStorage.checkInStorageGenreById(genreId)) {
-            log.error("Жанра нет в базе данных");
-            throw new NotFoundException("Жанра нет в базе данных");
-        }
-    }
-
-    public void validateMPA(int ratingId) throws NotFoundException {
-        if (!filmStorage.checkInStorageRatingById(ratingId)) {
-            log.error("Рейтинга нет в базе данных");
-            throw new NotFoundException("Рейтинга нет в базе данных");
         }
     }
 }

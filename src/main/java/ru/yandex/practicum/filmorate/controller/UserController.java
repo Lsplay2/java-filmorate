@@ -27,27 +27,24 @@ public class UserController {
 
     @GetMapping
     public List<User> getUsers() {
-        return new ArrayList<>(userService.userStorage.get().values());
+        return userService.getAll();
     }
 
     @GetMapping(value = "/{id}")
     public User getUserById(@PathVariable int id) throws NotFoundException {
-        userService.validateAtGetFriends(id);
-        return userService.userStorage.getById(id);
+        return userService.getById(id);
     }
 
     @PostMapping
     public User createUser(@RequestBody User user) throws ValidationException, NotFoundException {
-        userService.validateOnCreate(user);
-        userService.userStorage.add(user);
+        userService.createUser(user);
         log.info("Пользователь добавлен в коллекцию:" + user);
         return user;
     }
 
     @PutMapping
     public User createOrUpdateUser(@RequestBody User user) throws ValidationException, NotFoundException {
-        userService.validateOnUpdate(user);
-        userService.userStorage.add(user);
+        userService.updateUser(user);
         log.info("Пользователь обновлен в коллекции:" + user);
         return user;
     }
@@ -55,53 +52,48 @@ public class UserController {
     @PutMapping(value = "/{id}/friends/{friendId}")
     public User addFriend(@PathVariable int id,
                           @PathVariable int friendId) throws NotFoundException {
-        userService.validateAtAddOrDelFriends(id, friendId);
+
         userService.addFriend(id, friendId);
         log.info("Пользователь" + id + " добавил друга:" + friendId);
-        return userService.userStorage.getById(id);
+        return userService.getById(id);
     }
 
     @PutMapping(value = "/{id}/friends/{friendId}/confirm")
     public User confirmFriend(@PathVariable int id,
                           @PathVariable int friendId) throws NotFoundException {
-        userService.validateAtAddOrDelFriends(id, friendId);
         userService.confirmFriend(id, friendId);
         log.info("Пользователь" + id + " подтвердил друга:" + friendId);
-        return userService.userStorage.getById(id);
+        return userService.getById(id);
     }
 
     @DeleteMapping(value = "/{id}/friends/{friendId}")
     public User delFriend(@PathVariable int id,
                           @PathVariable int friendId) throws NotFoundException {
-        userService.validateAtAddOrDelFriends(id, friendId);
         userService.delFriend(id, friendId);
         log.info("Пользователь" + id + " удалил из друзей:" + friendId);
-        return userService.userStorage.getById(id);
+        return userService.getById(id);
     }
 
     @GetMapping(value = "/{id}/friends")
     public List<User> getAllFriend(@PathVariable int id) throws NotFoundException {
-       userService.validateAtGetFriends(id);
         return userService.getFriendList(id);
     }
 
     @GetMapping(value = "/{id}/friends/common/{otherId}")
     public List<User> getAllSameFriends(@PathVariable int id,
                                         @PathVariable int otherId) throws NotFoundException {
-        userService.validateAtAddOrDelFriends(id, otherId);
         return userService.getSameFriends(id, otherId);
     }
 
     @GetMapping(value = "/{id}/films")
     public List<Film> getFilmOnUser(@PathVariable int id) {
-        return userService.userStorage.findFilmOnUsers(id);
+        return userService.getFilmFromUser(id);
     }
 
     @PostMapping(value = "/{id}/films/{filmId}")
     public User addLikeToFilm(@PathVariable int id,
                                     @PathVariable int filmId) throws NotFoundException {
-        userService.userStorage.addUserToFilm(id, filmId);
-        return userService.userStorage.getById(id);
+        return userService.addLikeToFilm(id, filmId);
     }
 
 

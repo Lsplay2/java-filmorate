@@ -66,7 +66,6 @@ public class UserDbStorage implements UserStorage {
         String sqlQuery = "SELECT * FROM USERS WHERE USER_ID = ?";
         List<User> listUsers = jdbcTemplate.query(sqlQuery, this::mapRowToUser, id);
         return listUsers.size() != 0;
-
     }
 
     private Boolean mapRowForCheck(ResultSet resultSet, int rowSet) throws SQLException {
