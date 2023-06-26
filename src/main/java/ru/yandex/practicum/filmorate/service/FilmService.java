@@ -31,7 +31,7 @@ public class FilmService {
     }
 
     public Film getById(int id) throws NotFoundException {
-        if(filmStorage.checkInStorageById(id)) {
+        if (filmStorage.checkInStorageById(id)) {
             return filmStorage.getById(id);
         }
         throw new NotFoundException("Фильм не найден");
