@@ -6,59 +6,83 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class UserService {
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
-    public InMemoryUserStorage userStorage;
+    private UserDbStorage userStorage;
 
     @Autowired
-    public UserService(InMemoryUserStorage userStorage) {
+    public UserService(UserDbStorage userStorage) {
         this.userStorage = userStorage;
     }
 
+    public User getById(int id) throws NotFoundException {
+        validateAtGetId(id);
+        return userStorage.getById(id);
+    }
 
-    public void addFriend(int userId, int friendId) {
+    public List<User> getAll() {
+        return new ArrayList<>(userStorage.get().values());
+    }
+
+    public void createUser(User user) throws ValidationException, NotFoundException {
+        validateOnCreate(user);
+        userStorage.add(user);
+    }
+
+    public void updateUser(User user) throws ValidationException, NotFoundException {
+        validateOnUpdate(user);
+        userStorage.add(user);
+    }
+
+    public void addFriend(int userId, int friendId) throws NotFoundException {
+        validateAtAddOrDelFriends(userId, friendId);
         if (userId != 0 && friendId != 0) {
-            userStorage.getById(userId).addFriend(friendId);
-            userStorage.getById(friendId).addFriend(userId);
+            userStorage.addUserToFriend(userId, friendId);
         }
     }
 
-    public void delFriend(int userId, int friendId) {
+    public void delFriend(int userId, int friendId) throws NotFoundException {
+        validateAtAddOrDelFriends(userId, friendId);
         if (userId != 0 && friendId != 0) {
-            userStorage.getById(userId).addFriend(friendId);
-            userStorage.getById(friendId).addFriend(userId);
+            userStorage.delFriendFromUser(userId, friendId);
         }
     }
 
-    public List<User> getFriendList(User user) {
-        if (user != null) {
-            List<User> friendList = new ArrayList<>();
-            for (int id : user.getFriends()) {
-                friendList.add(userStorage.getById(id));
-            }
-            return friendList;
+    public List<User> getFriendList(int userId) throws NotFoundException {
+        if (userId != 0) {
+            return userStorage.findFriendOnUsers(userId);
         }
         return new ArrayList<>();
     }
 
-    public Set<User> getSameFriends(User user, User friend) {
-        Set<User> sameFriend = new HashSet<>();
-        for (int userFromFirst : user.getFriends()) {
-            if (friend.getFriends().contains(userFromFirst)) {
-                sameFriend.add(userStorage.getById(userFromFirst));
-            }
+    public void confirmFriend(int userId, int friendId) throws NotFoundException {
+        validateAtAddOrDelFriends(userId, friendId);
+        if (userId != 0 && friendId != 0) {
+            userStorage.confirmFriend(userId, friendId);
         }
-        return sameFriend;
+    }
+
+    public List<User> getSameFriends(int userId, int friendId) throws NotFoundException {
+        validateAtAddOrDelFriends(userId, friendId);
+        return userStorage.getSame(userId, friendId);
+    }
+
+    public List<Film> getFilmFromUser(int userId) {
+        return userStorage.findFilmOnUsers(userId);
+    }
+
+    public User addLikeToFilm(int userId, int filmId) throws NotFoundException {
+        userStorage.addUserToFilm(userId, filmId);
+        return userStorage.getById(userId);
     }
 
     private void validate(User user) throws ValidationException {
@@ -70,7 +94,7 @@ public class UserService {
         }
     }
 
-    public void validateAtAddOrDelFriends(int userId, int friendId) throws NotFoundException {
+    private void validateAtAddOrDelFriends(int userId, int friendId) throws NotFoundException {
         if (userStorage.checkInStorageById(userId) && userStorage.checkInStorageById(friendId)) {
             return;
         }
@@ -78,7 +102,7 @@ public class UserService {
         throw new NotFoundException("Ошибка в одном из id пользователя");
     }
 
-    public void validateAtGetFriends(int userId) throws NotFoundException {
+    private void validateAtGetId(int userId) throws NotFoundException {
         if (userStorage.checkInStorageById(userId)) {
             return;
         }
@@ -86,7 +110,7 @@ public class UserService {
         throw new NotFoundException("Ошибка в id пользователя");
     }
 
-    public void validateOnCreate(User user) throws ValidationException {
+    private void validateOnCreate(User user) throws ValidationException {
         validate(user);
         if (user.getName() == null || user.getName().isEmpty()) {
             log.warn("Имя пользователя не указано. Будет использоваться логин:" + user.getLogin());
@@ -94,7 +118,7 @@ public class UserService {
         }
     }
 
-    public void validateOnUpdate(User user) throws ValidationException, NotFoundException {
+    private void validateOnUpdate(User user) throws ValidationException, NotFoundException {
         validateOnCreate(user);
         if (!userStorage.checkInStorageById(user.getId())) {
             log.error("Ошибка фильм с таким id не существует");
