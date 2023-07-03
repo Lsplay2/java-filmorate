@@ -77,4 +77,20 @@ public class DirectorDbStorage {
         String sqlQuery = "update DIRECTOR set NAME = ? where DIRECTOR_ID = ?";
         jdbcTemplate.update(sqlQuery, director.getName(), director.getId());
     }
+
+    public int getMaxId() {
+        String sqlQuery = "select MAX(DIRECTOR_ID) AS MAX from DIRECTOR";
+        return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToInt);
+    }
+
+    private int mapRowToInt(ResultSet resultSet, int rowNum) throws SQLException {
+        return resultSet.getInt("MAX");
+    }
+
+    public void deleteDirector(int directorIb) {
+        String sqlQuery2 = "delete from DIRECTOR_FILM where DIRECTOR_ID = ?";
+        String sqlQuery = "delete from DIRECTOR where DIRECTOR_ID = ?";
+        jdbcTemplate.update(sqlQuery2, directorIb);
+        jdbcTemplate.update(sqlQuery,directorIb);
+    }
 }

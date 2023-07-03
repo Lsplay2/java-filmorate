@@ -35,17 +35,17 @@ public class DirectorController {
     }
 
     @PostMapping(value = "/directors")
-    public Director createDirector(@RequestBody Director director) throws ValidationException {
-        directorService.createDirector(director.getName());
-        log.info("Создан режиссер с именем " + director.getName());
-        return director;
+    public Director createDirector(@RequestBody Director director) throws ValidationException, NotFoundException {
+        Director directorBD = directorService.createDirector(director.getName());
+        log.info("Создан режиссер с именем " + directorBD.getName());
+        return directorBD;
     }
 
     @PutMapping(value = "/directors")
     public Director updateDirector(@RequestBody Director director) throws ValidationException, NotFoundException {
-        directorService.updateDirector(director);
+        Director directorBD = directorService.updateDirector(director);
         log.info("Режиссер изменен " + director.getName());
-        return director;
+        return directorBD;
     }
 
     @GetMapping(value = "/films/director/{directorId}")
@@ -53,5 +53,12 @@ public class DirectorController {
                                          @RequestParam(required = false, value = "sortBy") String sortBy)
             throws NotFoundException {
         return directorService.getSortedFilm(directorId, sortBy);
+    }
+
+    @DeleteMapping(value = "/directors/{id}")
+    public String deleteDirector(@PathVariable int id) {
+        directorService.deleteDirector(id);
+        log.info("Удален режиссер с id "+id);
+        return "Успешно";
     }
 }

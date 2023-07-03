@@ -37,6 +37,10 @@ public class FilmDbStorage implements FilmStorage {
                     "NAME = ?, RELEASEDATE = ?, DURATION = ?, DESCRIPTION = ? where FILM_ID = ?";
             jdbcTemplate.update(sqlQuery, film.getName(),film.getReleaseDate(), film.getDuration(),
                     film.getDescription(), film.getId());
+            if(film.getDirectors() == null) {
+                String sqlQueryForDel = "delete from DIRECTOR_FILM where FILM_ID = ?";
+                jdbcTemplate.update(sqlQueryForDel, film.getId());
+            }
         } else {
             if (film.getId() == 0) {
                 film.setId(getMaxId() + 1);
@@ -46,6 +50,7 @@ public class FilmDbStorage implements FilmStorage {
                 jdbcTemplate.update(sqlQuerry, film.getId(), film.getName(),
                         film.getReleaseDate(), film.getDuration(),film.getDescription());
         }
+
         if (film.getMpa() != null && film.getMpa().getId() != 0) {
             ratingDbStorage.addRatingToFilm(film.getId(),film.getMpa().getId());
         }
@@ -71,10 +76,8 @@ public class FilmDbStorage implements FilmStorage {
             }
         }
         film.setDirectors((findDirectorOnFilm(getMaxId())));
-        if (film.getDirectors() == null) {
-            film.setDirectors(new ArrayList<>());
-        }
     }
+
 
     public int getMaxId() {
         String sqlQuery = "select MAX(FILM_ID) AS MAX from FILM";

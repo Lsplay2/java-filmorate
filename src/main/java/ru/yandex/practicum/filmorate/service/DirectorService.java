@@ -37,9 +37,10 @@ public class DirectorService {
         return directorDbStorage.getDirectorById(id);
     }
 
-    public void createDirector(String name) throws ValidationException {
+    public Director createDirector(String name) throws ValidationException, NotFoundException {
         validateCreateDirector(name);
         directorDbStorage.createDirector(name);
+        return directorDbStorage.getDirectorById(directorDbStorage.getMaxId());
     }
 
     public Film addDirectorToFilm(int filmId, int directorId) throws NotFoundException {
@@ -48,9 +49,10 @@ public class DirectorService {
         return filmDbStorage.getById(filmId);
     }
 
-    public void updateDirector(Director director) throws ValidationException, NotFoundException {
+    public Director updateDirector(Director director) throws ValidationException, NotFoundException {
         validateUpdateDirector(director);
         directorDbStorage.updateDirector(director);
+        return directorDbStorage.getDirectorById(directorDbStorage.getMaxId());
     }
 
     public List<Film> getSortedFilm(int directorId, String sort) throws NotFoundException {
@@ -59,9 +61,9 @@ public class DirectorService {
             throw new NotFoundException("У данного режиссера нет фильмов");
         }
         if (sort == null || sort.equals("year")) {
-            return films.stream().sorted((Comparator.comparing(Film::getReleaseDate)).reversed())
+            return films.stream().sorted((Comparator.comparing(Film::getReleaseDate)))
                     .collect(Collectors.toList());
-        } else if (sort.equals("like")) {
+        } else if (sort.equals("likes")) {
             return films.stream().sorted((Comparator.comparing(Film::getNumOfLike)).reversed())
                     .collect(Collectors.toList());
         } else {
@@ -69,10 +71,21 @@ public class DirectorService {
         }
     }
 
+    public void deleteDirector(int directorId) {
+        directorDbStorage.deleteDirector(directorId);
+    }
+
+    private void validateName(String name) throws ValidationException {
+        if(name.isEmpty() || name.isBlank()) {
+            throw new ValidationException("Имя пустое");
+        }
+    }
+
     private void validateCreateDirector(String name) throws ValidationException {
         if (name == null) {
             throw new ValidationException("Genre is null");
         }
+        validateName(name);
     }
 
     private void validateAddDirector(int filmId, int directorId) throws NotFoundException {
@@ -96,5 +109,4 @@ public class DirectorService {
             throw new NotFoundException("Режиссера нет в бд");
         }
     }
-
 }
