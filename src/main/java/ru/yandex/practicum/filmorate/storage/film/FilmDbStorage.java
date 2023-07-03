@@ -236,8 +236,8 @@ public class FilmDbStorage implements FilmStorage {
         String sqlQuerry = "select FILM_ID from DIRECTOR_FILM where DIRECTOR_ID = ?";
         List<Integer> filmsId = jdbcTemplate.query(sqlQuerry, this::mapRowToFilmId, directorId);
         List<Film> films = new ArrayList<>();
-        for(Integer filmid : filmsId) {
-            films.add(getById(filmid));
+        for (Integer filmId : filmsId) {
+            films.add(getById(filmId));
         }
         return films;
     }
