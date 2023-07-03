@@ -50,7 +50,8 @@ public class DirectorController {
 
     @GetMapping(value = "/films/director/{directorId}")
     public List<Film> filmListByDirector(@PathVariable int directorId,
-                                         @RequestParam(required = false, value = "sortBy") String sortBy ) throws NotFoundException {
+                                         @RequestParam(required = false, value = "sortBy") String sortBy)
+            throws NotFoundException {
         return directorService.getSortedFilm(directorId, sortBy);
     }
 }

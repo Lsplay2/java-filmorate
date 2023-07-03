@@ -8,10 +8,8 @@ import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.director.DirectorDbStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
-import ru.yandex.practicum.filmorate.storage.film.GenreDbStorage;
 
 import java.util.Comparator;
 import java.util.List;
@@ -93,7 +91,7 @@ public class DirectorService {
 
     private void validateUpdateDirector(Director director) throws ValidationException, NotFoundException {
         validateCreateDirector(director.getName());
-        if(!directorDbStorage.checkInStorageDirectorById(director.getId())) {
+        if (!directorDbStorage.checkInStorageDirectorById(director.getId())) {
             log.error("Режиссера нет в бд");
             throw new NotFoundException("Режиссера нет в бд");
         }
