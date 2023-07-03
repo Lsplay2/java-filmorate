@@ -58,7 +58,7 @@ public class DirectorController {
     @DeleteMapping(value = "/directors/{id}")
     public String deleteDirector(@PathVariable int id) {
         directorService.deleteDirector(id);
-        log.info("Удален режиссер с id "+id);
+        log.info("Удален режиссер с id " + id);
         return "Успешно";
     }
 }

@@ -76,7 +76,7 @@ public class DirectorService {
     }
 
     private void validateName(String name) throws ValidationException {
-        if(name.isEmpty() || name.isBlank()) {
+        if (name.isEmpty() || name.isBlank()) {
             throw new ValidationException("Имя пустое");
         }
     }

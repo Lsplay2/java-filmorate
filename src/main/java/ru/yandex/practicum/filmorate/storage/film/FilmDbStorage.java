@@ -37,7 +37,7 @@ public class FilmDbStorage implements FilmStorage {
                     "NAME = ?, RELEASEDATE = ?, DURATION = ?, DESCRIPTION = ? where FILM_ID = ?";
             jdbcTemplate.update(sqlQuery, film.getName(),film.getReleaseDate(), film.getDuration(),
                     film.getDescription(), film.getId());
-            if(film.getDirectors() == null) {
+            if (film.getDirectors() == null) {
                 String sqlQueryForDel = "delete from DIRECTOR_FILM where FILM_ID = ?";
                 jdbcTemplate.update(sqlQueryForDel, film.getId());
             }
