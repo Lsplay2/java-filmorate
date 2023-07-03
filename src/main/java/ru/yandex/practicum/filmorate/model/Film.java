@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-//а вот и я
 @Data
 @Builder
 public class Film {
