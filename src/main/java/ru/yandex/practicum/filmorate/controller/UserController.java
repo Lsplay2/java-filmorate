@@ -48,12 +48,6 @@ public class UserController {
         return user;
     }
 
-    @DeleteMapping(value = "/{id}")
-    public  void delUser(@PathVariable int id) throws NotFoundException {
-        userService.delUser(id);
-        log.info("Пользователь удален. Текущее число пользователей:" + userService.getAll().size());
-    }
-
     @PutMapping(value = "/{id}/friends/{friendId}")
     public User addFriend(@PathVariable int id,
                           @PathVariable int friendId) throws NotFoundException {
