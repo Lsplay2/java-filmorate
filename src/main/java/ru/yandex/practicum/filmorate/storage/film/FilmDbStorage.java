@@ -220,6 +220,15 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(sqlQuerry, userId, filmId);
     }
 
+    public void delFilm(int id) {
+        String sqlQuerry1 = "delete from GENRE_FILM where FILM_ID = ?";
+        jdbcTemplate.update(sqlQuerry1, id);
+        String sqlQuerry2 = "delete from USER_FILM where FILM_ID = ?";
+        jdbcTemplate.update(sqlQuerry2, id);
+        String sqlQuerry3 = "delete from FILM where FILM_ID = ?";
+        jdbcTemplate.update(sqlQuerry3, id);
+    }
+    
     public List<Director> findDirectorOnFilm(int filmId) {
         String sqlQuery = "select DIRECTOR_ID " +
                 "from DIRECTOR_FILM where FILM_ID = ?";
@@ -234,7 +243,7 @@ public class FilmDbStorage implements FilmStorage {
         }
         return directors;
     }
-
+    
     public List<Film> findFilmsOnDirector(int directorId) {
         String sqlQuerry = "select FILM_ID from DIRECTOR_FILM where DIRECTOR_ID = ?";
         List<Integer> filmsId = jdbcTemplate.query(sqlQuerry, this::mapRowToFilmId, directorId);
@@ -247,14 +256,5 @@ public class FilmDbStorage implements FilmStorage {
 
     private int mapRowToFilmId(ResultSet resultSet, int rowNum) throws SQLException {
         return resultSet.getInt("FILM_ID");
-    }
-  
-    public void delFilm(int id) {
-        String sqlQuerry1 = "delete from GENRE_FILM where FILM_ID = ?";
-        jdbcTemplate.update(sqlQuerry1, id);
-        String sqlQuerry2 = "delete from USER_FILM where FILM_ID = ?";
-        jdbcTemplate.update(sqlQuerry2, id);
-        String sqlQuerry3 = "delete from FILM where FILM_ID = ?";
-        jdbcTemplate.update(sqlQuerry3, id);
     }
 }
