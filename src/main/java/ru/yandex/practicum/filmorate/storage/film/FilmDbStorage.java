@@ -4,9 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.director.DirectorDbStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,12 +19,15 @@ public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private final RatingDbStorage ratingDbStorage;
     private final GenreDbStorage genreDbStorage;
+    private final DirectorDbStorage directorDbStorage;
 
     @Autowired
-    public FilmDbStorage(JdbcTemplate jdbcTemplate, RatingDbStorage ratingDbStorage, GenreDbStorage genreDbStorage) {
+    public FilmDbStorage(JdbcTemplate jdbcTemplate, RatingDbStorage ratingDbStorage, GenreDbStorage genreDbStorage,
+                         DirectorDbStorage directorDbStorage) {
         this.jdbcTemplate = jdbcTemplate;
         this.ratingDbStorage = ratingDbStorage;
         this.genreDbStorage = genreDbStorage;
+        this.directorDbStorage = directorDbStorage;
     }
 
     @Override
@@ -32,6 +37,10 @@ public class FilmDbStorage implements FilmStorage {
                     "NAME = ?, RELEASEDATE = ?, DURATION = ?, DESCRIPTION = ? where FILM_ID = ?";
             jdbcTemplate.update(sqlQuery, film.getName(),film.getReleaseDate(), film.getDuration(),
                     film.getDescription(), film.getId());
+            if (film.getDirectors() == null) {
+                String sqlQueryForDel = "delete from DIRECTOR_FILM where FILM_ID = ?";
+                jdbcTemplate.update(sqlQueryForDel, film.getId());
+            }
         } else {
             if (film.getId() == 0) {
                 film.setId(getMaxId() + 1);
@@ -41,6 +50,7 @@ public class FilmDbStorage implements FilmStorage {
                 jdbcTemplate.update(sqlQuerry, film.getId(), film.getName(),
                         film.getReleaseDate(), film.getDuration(),film.getDescription());
         }
+
         if (film.getMpa() != null && film.getMpa().getId() != 0) {
             ratingDbStorage.addRatingToFilm(film.getId(),film.getMpa().getId());
         }
@@ -56,7 +66,18 @@ public class FilmDbStorage implements FilmStorage {
         if (film.getGenres() == null) {
             film.setGenres(new ArrayList<>());
         }
+
+        if (film.getDirectors() != null) {
+            for (Director director : findDirectorOnFilm(film.getId())) {
+                directorDbStorage.dellDirectorFromFilm(director.getId(), film.getId());
+            }
+            for (Director director : film.getDirectors()) {
+                directorDbStorage.addDirectorToFilm(director.getId(), film.getId());
+            }
+        }
+        film.setDirectors((findDirectorOnFilm(getMaxId())));
     }
+
 
     public int getMaxId() {
         String sqlQuery = "select MAX(FILM_ID) AS MAX from FILM";
@@ -114,6 +135,16 @@ public class FilmDbStorage implements FilmStorage {
         if (film.getGenres() == null) {
             film.setGenres(new ArrayList<>());
         }
+
+        List<Director> directors = findDirectorOnFilm(film.getId());
+        if (!directors.isEmpty()) {
+            directors.sort(Comparator.comparing(Director::getId));
+            film.setDirectors(directors);
+        }
+        if (film.getDirectors() == null) {
+            film.setDirectors(new ArrayList<>());
+        }
+
         int ratingId = resultSet.getInt("RATING_ID");
         if (ratingId != 0) {
             try {
@@ -162,6 +193,7 @@ public class FilmDbStorage implements FilmStorage {
         return genres;
     }
 
+
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
         return User.builder()
                 .id(resultSet.getInt("USER_ID"))
@@ -188,4 +220,32 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(sqlQuerry, userId, filmId);
     }
 
+    public List<Director> findDirectorOnFilm(int filmId) {
+        String sqlQuery = "select DIRECTOR_ID " +
+                "from DIRECTOR_FILM where FILM_ID = ?";
+        List<Integer> directorsId = jdbcTemplate.query(sqlQuery,directorDbStorage::mapRowToDirectorId, filmId);
+        List<Director> directors = new ArrayList<>();
+        for (Integer id : directorsId) {
+            try {
+                directors.add(directorDbStorage.getDirectorById(id));
+            } catch (NotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return directors;
+    }
+
+    public List<Film> findFilmsOnDirector(int directorId) {
+        String sqlQuerry = "select FILM_ID from DIRECTOR_FILM where DIRECTOR_ID = ?";
+        List<Integer> filmsId = jdbcTemplate.query(sqlQuerry, this::mapRowToFilmId, directorId);
+        List<Film> films = new ArrayList<>();
+        for (Integer filmId : filmsId) {
+            films.add(getById(filmId));
+        }
+        return films;
+    }
+
+    private int mapRowToFilmId(ResultSet resultSet, int rowNum) throws SQLException {
+        return resultSet.getInt("FILM_ID");
+    }
 }
