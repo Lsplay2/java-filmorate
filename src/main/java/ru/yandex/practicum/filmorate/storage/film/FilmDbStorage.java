@@ -228,7 +228,7 @@ public class FilmDbStorage implements FilmStorage {
         String sqlQuerry3 = "delete from FILM where FILM_ID = ?";
         jdbcTemplate.update(sqlQuerry3, id);
     }
-    
+
     public List<Director> findDirectorOnFilm(int filmId) {
         String sqlQuery = "select DIRECTOR_ID " +
                 "from DIRECTOR_FILM where FILM_ID = ?";
@@ -243,7 +243,7 @@ public class FilmDbStorage implements FilmStorage {
         }
         return directors;
     }
-    
+
     public List<Film> findFilmsOnDirector(int directorId) {
         String sqlQuerry = "select FILM_ID from DIRECTOR_FILM where DIRECTOR_ID = ?";
         List<Integer> filmsId = jdbcTemplate.query(sqlQuerry, this::mapRowToFilmId, directorId);
