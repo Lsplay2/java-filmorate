@@ -41,12 +41,17 @@ public class FilmController {
     }
 
 
-
     @PutMapping
     public Film updateFilm(@RequestBody Film film) throws ValidationException, NotFoundException {
         Film filmTemp = filmService.updateFilm(film);
         log.info("Фильм обновлен в коллекции:" + film);
         return filmTemp;
+    }
+
+    @DeleteMapping(value = "/{id}")
+    public void delFilm(@PathVariable int id) throws NotFoundException {
+        filmService.delFilm(id);
+        log.info("Фильм удален. Текущее число фильмов:" + filmService.getAll().size());
     }
 
     @PutMapping(value = "/{id}/like/{userId}")
@@ -68,7 +73,7 @@ public class FilmController {
     @GetMapping(value = "/popular")
     public List<Film> getTop(@RequestParam(defaultValue = "10") Integer count) {
         if (count <= 0) {
-           return new ArrayList<>(filmService.getTopFilm(10));
+            return new ArrayList<>(filmService.getTopFilm(10));
         }
         return new ArrayList<>(filmService.getTopFilm(count));
     }
