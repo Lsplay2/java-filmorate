@@ -30,19 +30,19 @@ public class FilmDbStorage implements FilmStorage {
         if (checkInStorageById(film.getId())) {
             String sqlQuery = "update FILM set " +
                     "NAME = ?, RELEASEDATE = ?, DURATION = ?, DESCRIPTION = ? where FILM_ID = ?";
-            jdbcTemplate.update(sqlQuery, film.getName(), film.getReleaseDate(), film.getDuration(),
+            jdbcTemplate.update(sqlQuery, film.getName(),film.getReleaseDate(), film.getDuration(),
                     film.getDescription(), film.getId());
         } else {
             if (film.getId() == 0) {
                 film.setId(getMaxId() + 1);
             }
-            String sqlQuerry = "insert into FILM(FILM_ID, NAME, RELEASEDATE, DURATION, DESCRIPTION)" +
-                    "values (?, ?, ?, ?, ?)";
-            jdbcTemplate.update(sqlQuerry, film.getId(), film.getName(),
-                    film.getReleaseDate(), film.getDuration(), film.getDescription());
+                String sqlQuerry = "insert into FILM(FILM_ID, NAME, RELEASEDATE, DURATION, DESCRIPTION)" +
+                        "values (?, ?, ?, ?, ?)";
+                jdbcTemplate.update(sqlQuerry, film.getId(), film.getName(),
+                        film.getReleaseDate(), film.getDuration(),film.getDescription());
         }
         if (film.getMpa() != null && film.getMpa().getId() != 0) {
-            ratingDbStorage.addRatingToFilm(film.getId(), film.getMpa().getId());
+            ratingDbStorage.addRatingToFilm(film.getId(),film.getMpa().getId());
         }
         if (film.getGenres() != null) {
             for (Genre genre : findGenreOnFilm(film.getId())) {
@@ -90,7 +90,6 @@ public class FilmDbStorage implements FilmStorage {
         }
         return mapFilms;
     }
-
 
     public boolean checkInStorageById(int id) {
         String sqlQuery = "SELECT * FROM FILM WHERE FILM_ID = ?";
@@ -140,7 +139,7 @@ public class FilmDbStorage implements FilmStorage {
     public List<User> findUserOnFilm(int userId) {
         String sqlQuery = "select USER_ID " +
                 "from USER_FILM where FILM_ID = ?";
-        List<Integer> usersId = jdbcTemplate.query(sqlQuery, this::mapRowToUserId, userId);
+        List<Integer> usersId = jdbcTemplate.query(sqlQuery,this::mapRowToUserId, userId);
         List<User> users = new ArrayList<>();
         for (Integer id : usersId) {
             users.add(getUserById(id));
@@ -151,7 +150,7 @@ public class FilmDbStorage implements FilmStorage {
     public List<Genre> findGenreOnFilm(int filmId) {
         String sqlQuery = "select GENRE_ID " +
                 "from GENRE_FILM where FILM_ID = ?";
-        List<Integer> genresId = jdbcTemplate.query(sqlQuery, genreDbStorage::mapRowToGenreId, filmId);
+        List<Integer> genresId = jdbcTemplate.query(sqlQuery,genreDbStorage::mapRowToGenreId, filmId);
         List<Genre> genres = new ArrayList<>();
         for (Integer id : genresId) {
             try {
@@ -189,12 +188,4 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(sqlQuerry, userId, filmId);
     }
 
-    public void delFilm(int id) {
-        String sqlQuerry1 = "delete from GENRE_FILM where FILM_ID = ?";
-        jdbcTemplate.update(sqlQuerry1, id);
-        String sqlQuerry2 = "delete from USER_FILM where FILM_ID = ?";
-        jdbcTemplate.update(sqlQuerry2, id);
-        String sqlQuerry3 = "delete from FILM where FILM_ID = ?";
-        jdbcTemplate.update(sqlQuerry3, id);
-    }
 }

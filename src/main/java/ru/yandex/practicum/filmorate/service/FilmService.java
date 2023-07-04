@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Service
 public class FilmService {
 
-    private static final LocalDate MIN_DATE = LocalDate.of(1895, 12, 28);
+    private static final LocalDate MIN_DATE = LocalDate.of(1895,12,28);
     private static final Logger log = LoggerFactory.getLogger(FilmService.class);
     private final FilmDbStorage filmStorage;
     private final UserDbStorage userStorage;
@@ -77,14 +77,6 @@ public class FilmService {
                 .collect(Collectors.toList());
     }
 
-    public void delFilm(int id) {
-        if (filmStorage.checkInStorageById(id)) {
-            filmStorage.delFilm(id);
-        } else {
-            log.error("Ошибка в id фильма");
-        }
-    }
-
     private void validateAddAndDelLike(int filmId, int userId) throws NotFoundException {
         if (filmStorage.checkInStorageById(filmId) && userStorage.checkInStorageById(userId)) {
             return;
@@ -109,6 +101,4 @@ public class FilmService {
             throw new NotFoundException("Фильма с таким id не существует");
         }
     }
-
-
 }

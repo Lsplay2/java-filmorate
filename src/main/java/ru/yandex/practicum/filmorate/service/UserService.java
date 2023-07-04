@@ -43,14 +43,6 @@ public class UserService {
         userStorage.add(user);
     }
 
-    public void delUser(int id) {
-        if (userStorage.checkInStorageById(id)) {
-            userStorage.delUser(id);
-        } else {
-            log.error("Ошибка в id пользователя");
-        }
-    }
-
     public void addFriend(int userId, int friendId) throws NotFoundException {
         validateAtAddOrDelFriends(userId, friendId);
         if (userId != 0 && friendId != 0) {
@@ -67,7 +59,6 @@ public class UserService {
 
     public List<User> getFriendList(int userId) throws NotFoundException {
         if (userId != 0) {
-            validateAtGetId(userId);
             return userStorage.findFriendOnUsers(userId);
         }
         return new ArrayList<>();

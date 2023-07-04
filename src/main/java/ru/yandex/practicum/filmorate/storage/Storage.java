@@ -12,5 +12,4 @@ public interface Storage<T> {
     boolean checkInStorage(T some) throws NotFoundException;
 
     Map<Integer, T> get();
-
 }
