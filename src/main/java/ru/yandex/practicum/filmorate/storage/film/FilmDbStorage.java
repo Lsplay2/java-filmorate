@@ -188,4 +188,13 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(sqlQuerry, userId, filmId);
     }
 
+    public void delFilm(int id) {
+        String sqlQuerry1 = "delete from GENRE_FILM where FILM_ID = ?";
+        jdbcTemplate.update(sqlQuerry1, id);
+        String sqlQuerry2 = "delete from USER_FILM where FILM_ID = ?";
+        jdbcTemplate.update(sqlQuerry2, id);
+        String sqlQuerry3 = "delete from FILM where FILM_ID = ?";
+        jdbcTemplate.update(sqlQuerry3, id);
+    }
+
 }

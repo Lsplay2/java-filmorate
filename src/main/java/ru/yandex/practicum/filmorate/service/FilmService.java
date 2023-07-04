@@ -53,6 +53,14 @@ public class FilmService {
         return filmStorage.getById(film.getId());
     }
 
+    public void delFilm(int id) {
+        if (filmStorage.checkInStorageById(id)) {
+            filmStorage.delFilm(id);
+        } else {
+            log.error("Ошибка в id фильма");
+        }
+    }
+
     public void addLike(int filmId, int userId) throws NotFoundException {
         validateAddAndDelLike(filmId, userId);
         if (filmStorage.checkInStorageById(filmId)
@@ -101,4 +109,5 @@ public class FilmService {
             throw new NotFoundException("Фильма с таким id не существует");
         }
     }
+
 }
