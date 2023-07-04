@@ -67,6 +67,7 @@ public class UserService {
 
     public List<User> getFriendList(int userId) throws NotFoundException {
         if (userId != 0) {
+            validateAtGetId(userId);
             return userStorage.findFriendOnUsers(userId);
         }
         return new ArrayList<>();
