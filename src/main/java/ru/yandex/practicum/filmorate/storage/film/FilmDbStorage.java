@@ -249,7 +249,7 @@ public class FilmDbStorage implements FilmStorage {
         return resultSet.getInt("FILM_ID");
     }
   
-  public void delFilm(int id) {
+    public void delFilm(int id) {
         String sqlQuerry1 = "delete from GENRE_FILM where FILM_ID = ?";
         jdbcTemplate.update(sqlQuerry1, id);
         String sqlQuerry2 = "delete from USER_FILM where FILM_ID = ?";
