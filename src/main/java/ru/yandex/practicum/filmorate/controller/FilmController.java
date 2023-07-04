@@ -49,6 +49,12 @@ public class FilmController {
         return filmTemp;
     }
 
+    @DeleteMapping(value = "/{id}")
+    public void delFilm(@PathVariable int id) throws NotFoundException {
+        filmService.delFilm(id);
+        log.info("Фильм удален. Текущее число фильмов:" + filmService.getAll().size());
+    }
+
     @PutMapping(value = "/{id}/like/{userId}")
     public Film addLike(@PathVariable int id,
                         @PathVariable int userId) throws NotFoundException {
