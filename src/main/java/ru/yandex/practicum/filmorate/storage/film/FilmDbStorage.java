@@ -188,4 +188,14 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(sqlQuerry, userId, filmId);
     }
 
+    public List<Film> getCommonFilms(Integer userId, Integer friendId) {
+        String sqlQuery = "SELECT film.FILM_ID, film.NAME, film.RELEASEDATE, film.DURATION, film.DESCRIPTION, film.RATING_ID " +
+                "FROM FILM film " +
+                "INNER JOIN USER_FILM userFilm1 ON film.FILM_ID = userFilm1.FILM_ID AND userFilm1.USER_ID = ? " +
+                "INNER JOIN USER_FILM userFilm2 ON film.FILM_ID = userFilm2.FILM_ID AND userFilm2.USER_ID = ?";
+
+        return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, userId, friendId);
+    }
+
+
 }
