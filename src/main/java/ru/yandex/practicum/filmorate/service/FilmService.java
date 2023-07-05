@@ -101,9 +101,9 @@ public class FilmService {
             throw new NotFoundException("Фильма с таким id не существует");
         }
     }
-
+//
     public List<Film> getCommonFilms(Integer userId, Integer friendId) {
         return filmStorage.getCommonFilms(userId, friendId);
     }
-    //
+
 }
