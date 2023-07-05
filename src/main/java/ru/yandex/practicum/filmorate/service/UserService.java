@@ -94,6 +94,11 @@ public class UserService {
         return userStorage.getById(userId);
     }
 
+    public List<Film> getRecommendations(int id) throws NotFoundException {
+        validateAtGetId(id);
+        return userStorage.getRecommendations(id);
+    }
+
     private void validate(User user) throws ValidationException {
         if (user.getEmail().isEmpty() || !user.getEmail().contains("@") || user.getLogin() == null
                 || user.getLogin().isEmpty() || user.getLogin().contains(" ")

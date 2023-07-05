@@ -28,7 +28,7 @@ public class UserDbStorage implements UserStorage {
         if (checkInStorageById(user.getId())) {
             String sqlQuery = "update USERS set " +
                     "NAME = ?, EMAIL = ?, LOGIN = ?, BIRTHDAY = ? where USER_ID = ?";
-            jdbcTemplate.update(sqlQuery, user.getName(),user.getEmail(), user.getLogin(),
+            jdbcTemplate.update(sqlQuery, user.getName(), user.getEmail(), user.getLogin(),
                     user.getBirthday(), user.getId());
         } else {
             if (user.getId() == 0) {
@@ -102,7 +102,7 @@ public class UserDbStorage implements UserStorage {
         return user;
     }
 
-        public void addUserToFilm(int userId, int filmId) {
+    public void addUserToFilm(int userId, int filmId) {
         String sqlQuerry = "insert into USER_FILM(USER_ID, FILM_ID)" +
                 "values (?, ?)";
         jdbcTemplate.update(sqlQuerry, userId, filmId);
@@ -117,7 +117,7 @@ public class UserDbStorage implements UserStorage {
     public List<Film> findFilmOnUsers(int userId) {
         String sqlQuery = "select FILM_ID " +
                 "from USER_FILM where USER_ID = ?";
-        List<Integer> filmId = jdbcTemplate.query(sqlQuery,this::mapRowToFilmId, userId);
+        List<Integer> filmId = jdbcTemplate.query(sqlQuery, this::mapRowToFilmId, userId);
         List<Film> films = new ArrayList<>();
         for (Integer id : filmId) {
             films.add(getFilmById(id));
@@ -127,12 +127,12 @@ public class UserDbStorage implements UserStorage {
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         return Film.builder()
-                 .id(resultSet.getInt("FILM_ID"))
-                 .name(resultSet.getString("NAME"))
-                 .releaseDate(resultSet.getDate("RELEASEDATE").toLocalDate())
-                 .description(resultSet.getString("DESCRIPTION"))
-                 .duration(resultSet.getInt("DURATION"))
-                 .build();
+                .id(resultSet.getInt("FILM_ID"))
+                .name(resultSet.getString("NAME"))
+                .releaseDate(resultSet.getDate("RELEASEDATE").toLocalDate())
+                .description(resultSet.getString("DESCRIPTION"))
+                .duration(resultSet.getInt("DURATION"))
+                .build();
     }
 
     private Integer mapRowToFilmId(ResultSet resultSet, int rowNum) throws SQLException {
@@ -151,18 +151,18 @@ public class UserDbStorage implements UserStorage {
     }
 
     public void delFriendFromUser(int userId, int friendId) {
-        String  sqlQuerry = "delete from USER_FRIEND where USER_ID = ? and FRIEND_ID = ?";
+        String sqlQuerry = "delete from USER_FRIEND where USER_ID = ? and FRIEND_ID = ?";
         jdbcTemplate.update(sqlQuerry, userId, friendId);
     }
 
     public List<User> findFriendOnUsers(int userId) {
         String sqlQuery = "select FRIEND_ID " +
                 "from USER_FRIEND where USER_ID = ?";
-        List<Integer> usersId = jdbcTemplate.query(sqlQuery,this::mapRowToUserId, userId);
+        List<Integer> usersId = jdbcTemplate.query(sqlQuery, this::mapRowToUserId, userId);
 
         String sqlQuery2 = "select USER_ID " +
                 "from USER_FRIEND where FRIEND_ID = ? AND CONFIRM ";
-        List<Integer> usersId2 = jdbcTemplate.query(sqlQuery2,this::mapRowToFriendId, userId);
+        List<Integer> usersId2 = jdbcTemplate.query(sqlQuery2, this::mapRowToFriendId, userId);
 
         usersId.addAll(usersId2);
         List<User> users = new ArrayList<>();
@@ -187,10 +187,10 @@ public class UserDbStorage implements UserStorage {
     public List<User> getSame(int userId, int friendId) {
         List<User> userFriends = findFriendOnUsers(userId);
         List<User> friendFriends = findFriendOnUsers(friendId);
-        return checkSame(userFriends,friendFriends);
+        return checkSame(userFriends, friendFriends);
     }
 
-    private static  List<User> checkSame(List<User> first, List<User> second) {
+    private static List<User> checkSame(List<User> first, List<User> second) {
         List<User> common = new ArrayList<>(first);
         common.retainAll(second);
         return common;
@@ -203,5 +203,65 @@ public class UserDbStorage implements UserStorage {
         jdbcTemplate.update(sqlQuerry2, id, id);
         String sqlQuerry3 = "delete from USERS where USER_ID = ?";
         jdbcTemplate.update(sqlQuerry3, id);
+    }
+
+    public List<Film> getRecommendations(int id) {
+
+        int maxCount = 0;
+        int userIdWithMaxCross = 0;
+        List<Film> recomendations = new ArrayList<>();
+
+        //Заполняем List id фильмов пользователя по которому запрашиваются рекомендации
+        List<Integer> filmIdUser = getIdFilmsListFromUserFilm(id);
+
+        //Создаем List со всеми остальными пользователями поставившими лайки
+        String sqlQuery1 = "select USER_ID from USER_FILM ";
+        List<Integer> userIdWhoStayLike = jdbcTemplate.query(sqlQuery1, this::mapRowToUserIdWhoStayLike);
+
+        //Проходимся циклом по пользователям поставившим лайки
+        for (Integer userId : userIdWhoStayLike) {
+            int count = 0;
+            if (userId == id) {
+                continue;
+            }
+            //Кладем в List фильмы одного пользователя поставившего лайк
+            List<Integer> filmListIdUserWhoStayLike = getIdFilmsListFromUserFilm(userId);
+
+            //Проходим по этому листу циклом и ищем пересечения фильмов, считаем их
+            for (int i = 0; i < filmListIdUserWhoStayLike.size(); i++) {
+                if (filmIdUser.contains(filmListIdUserWhoStayLike.get(i))) {
+                    count++;
+                }
+            }
+            //Находим пользователя с максимальным количеством пересечений по фильмам
+            // с пользователем пользователя по которому запрашиваются рекомендации
+            if (count > maxCount) {
+                maxCount = count;
+                userIdWithMaxCross = userId;
+            }
+        }
+
+        List<Integer> filmIdUserWithMaxCross = new ArrayList<>();
+        //Пишем в filmIdUserWithMaxCross id фильмов по которым нет пересечений:
+        if (userIdWithMaxCross != 0) {
+            filmIdUserWithMaxCross = getIdFilmsListFromUserFilm(userIdWithMaxCross);
+        }
+
+        //Добавляем фильмы в рекомендации
+        for (int i = 0; i < filmIdUserWithMaxCross.size(); i++) {
+            if (!filmIdUser.contains(filmIdUserWithMaxCross.get(i))) {
+                recomendations.add(filmDbStorage.getById(filmIdUserWithMaxCross.get(i)));
+            }
+        }
+        return recomendations;
+    }
+
+    private Integer mapRowToUserIdWhoStayLike(ResultSet resultSet, int rowNum) throws SQLException {
+        return resultSet.getInt("USER_ID");
+    }
+
+    private List<Integer> getIdFilmsListFromUserFilm(int id) {
+        String sqlQuery = "select FILM_ID from USER_FILM where USER_ID = ?";
+        return jdbcTemplate.query(sqlQuery, this::mapRowToFilmId, id);
     }
 }
