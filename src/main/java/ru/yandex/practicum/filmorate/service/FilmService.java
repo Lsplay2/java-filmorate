@@ -105,4 +105,5 @@ public class FilmService {
     public List<Film> getCommonFilms(Integer userId, Integer friendId) {
         return filmStorage.getCommonFilms(userId, friendId);
     }
+    //
 }
