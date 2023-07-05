@@ -102,7 +102,6 @@ public class UserController {
         return userService.addLikeToFilm(id, filmId);
     }
 
-
     @GetMapping(value = "/{id}/recommendations")
     public List<Film> getRecommendations(@PathVariable int id) throws NotFoundException {
         return userService.getRecommendations(id);
