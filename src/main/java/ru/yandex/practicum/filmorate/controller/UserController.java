@@ -49,7 +49,7 @@ public class UserController {
     }
 
     @DeleteMapping(value = "/{id}")
-    public  void delUser(@PathVariable int id) throws NotFoundException {
+    public void delUser(@PathVariable int id) throws NotFoundException {
         userService.delUser(id);
         log.info("Пользователь удален. Текущее число пользователей:" + userService.getAll().size());
     }
@@ -65,7 +65,7 @@ public class UserController {
 
     @PutMapping(value = "/{id}/friends/{friendId}/confirm")
     public User confirmFriend(@PathVariable int id,
-                          @PathVariable int friendId) throws NotFoundException {
+                              @PathVariable int friendId) throws NotFoundException {
         userService.confirmFriend(id, friendId);
         log.info("Пользователь" + id + " подтвердил друга:" + friendId);
         return userService.getById(id);
@@ -97,9 +97,12 @@ public class UserController {
 
     @PostMapping(value = "/{id}/films/{filmId}")
     public User addLikeToFilm(@PathVariable int id,
-                                    @PathVariable int filmId) throws NotFoundException {
+                              @PathVariable int filmId) throws NotFoundException {
         return userService.addLikeToFilm(id, filmId);
     }
 
-
+    @GetMapping(value = "/{id}/recommendations")
+    public List<Film> getRecommendations(@PathVariable int id) throws NotFoundException {
+        return userService.getRecommendations(id);
+    }
 }
