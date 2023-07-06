@@ -73,8 +73,8 @@ public class ReviewStorage {
                     review.getContent(),
                     review.getReviewId()
             );
-            log.info("UPDATE " + review);
-            return review;
+            log.info("UPDATE " + getReview(review.getReviewId()));
+            return getReview(review.getReviewId());
         } else {
             throw new NotFoundException("мертвое умереть не может");
         }
@@ -196,12 +196,14 @@ public class ReviewStorage {
                     build()
             );
         }
+        log.info("GET REVIEWS " + reviews);
         reviews.forEach(review -> setUseful(review));
         log.info("GET REVIEWS " + reviews);
         return reviews;
     }
 
     private void setUseful(Review review) {
+        log.info("USEFUL " + review);
         SqlRowSet likesRows = jdbcTemplate.queryForRowSet("select count(*) as LIKES from REVIEW_LIKES " +
                         "where REVIEW_ID = ? and IS_LIKE = ?",
                 review.getReviewId(), true);
