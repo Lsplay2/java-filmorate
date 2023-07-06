@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
 @Service
 public class FilmService {
 
-    private static final LocalDate MIN_DATE = LocalDate.of(1895,12,28);
+    private static final LocalDate MIN_DATE = LocalDate.of(1895, 12, 28);
     private static final Logger log = LoggerFactory.getLogger(FilmService.class);
     private final FilmDbStorage filmStorage;
     private final UserDbStorage userStorage;
@@ -114,4 +115,27 @@ public class FilmService {
         return filmStorage.getCommonFilms(userId, friendId);
     }
 
+    public List<Film> getSearch(String query, Boolean isTitle, Boolean isDirector) {
+        List<Film> films = new ArrayList<>(filmStorage.get().values());
+        return films.stream()
+                .filter(film -> filterForSearch(query, isTitle, isDirector, film))
+                .sorted((Comparator.comparing(Film::getNumOfLike)).reversed())
+                .collect(Collectors.toList());
+    }
+
+    private Boolean filterForSearch(String query, Boolean isTitle, Boolean isDirector, Film film) {
+        if (isTitle && isDirector) {
+            List<Director> directors = film.getDirectors();
+            return film.getName().toLowerCase().contains(query.toLowerCase()) || directors.stream()
+                    .filter(director -> director.getName().toLowerCase().contains(query.toLowerCase()))
+                    .toList().size() > 0;
+        } else if (isTitle) {
+            return film.getName().toLowerCase().contains(query.toLowerCase());
+        } else {
+            List<Director> directors = film.getDirectors();
+            return directors.stream()
+                    .filter(director -> director.getName()
+                            .toLowerCase().contains(query.toLowerCase())).toList().size() > 0;
+        }
+    }
 }

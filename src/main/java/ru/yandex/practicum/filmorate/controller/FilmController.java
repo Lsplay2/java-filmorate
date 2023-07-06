@@ -41,7 +41,6 @@ public class FilmController {
     }
 
 
-
     @PutMapping
     public Film updateFilm(@RequestBody Film film) throws ValidationException, NotFoundException {
         Film filmTemp = filmService.updateFilm(film);
@@ -74,7 +73,7 @@ public class FilmController {
     @GetMapping(value = "/popular")
     public List<Film> getTop(@RequestParam(defaultValue = "10") Integer count) {
         if (count <= 0) {
-           return new ArrayList<>(filmService.getTopFilm(10));
+            return new ArrayList<>(filmService.getTopFilm(10));
         }
         return new ArrayList<>(filmService.getTopFilm(count));
     }
@@ -83,5 +82,18 @@ public class FilmController {
     public List<Film> getCommonFilms(@RequestParam Integer userId, @RequestParam Integer friendId) {
         log.info("Поступил запрос на получение общих фильмов у пользователей {} и {}.", userId, friendId);
         return filmService.getCommonFilms(userId, friendId);
+    }
+
+    @GetMapping(value = "/search")
+    public List<Film> getSearchedFilms(@RequestParam String query, @RequestParam String by) {
+        if (by.equals("director")) {
+            return filmService.getSearch(query, false, true);
+        } else if (by.equals("title")) {
+            return filmService.getSearch(query, true, false);
+        } else if (by.equals("director,title") || by.equals("title,director")) {
+            return filmService.getSearch(query, true, true);
+        } else {
+            return null;
+        }
     }
 }
