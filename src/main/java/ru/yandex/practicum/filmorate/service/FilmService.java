@@ -128,14 +128,14 @@ public class FilmService {
             List<Director> directors = film.getDirectors();
             return film.getName().toLowerCase().contains(query.toLowerCase()) || directors.stream()
                     .filter(director -> director.getName().toLowerCase().contains(query.toLowerCase()))
-                    .toList().size() > 0;
+                    .toArray().length > 0;
         } else if (isTitle) {
             return film.getName().toLowerCase().contains(query.toLowerCase());
         } else {
             List<Director> directors = film.getDirectors();
             return directors.stream()
                     .filter(director -> director.getName()
-                            .toLowerCase().contains(query.toLowerCase())).toList().size() > 0;
+                            .toLowerCase().contains(query.toLowerCase())).toArray().length > 0;
         }
     }
 }
