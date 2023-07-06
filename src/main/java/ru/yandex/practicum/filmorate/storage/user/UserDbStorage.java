@@ -115,9 +115,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     public List<Film> findFilmOnUsers(int userId) {
-        String sqlQuery = "select FILM_ID " +
-                "from USER_FILM where USER_ID = ?";
-        List<Integer> filmId = jdbcTemplate.query(sqlQuery, this::mapRowToFilmId, userId);
+        List<Integer> filmId = getIdFilmsListFromUserFilm(userId);
         List<Film> films = new ArrayList<>();
         for (Integer id : filmId) {
             films.add(getFilmById(id));
