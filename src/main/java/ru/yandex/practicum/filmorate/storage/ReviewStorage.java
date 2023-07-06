@@ -145,12 +145,12 @@ public class ReviewStorage {
         SqlRowSet reviewRows = jdbcTemplate.queryForRowSet("select * from REVIEW where REVIEW_ID = ?",
                 reviewId);
         if (reviewRows.next()) {
-            Review review = Review.builder().reviewId(reviewId).
-                    content(reviewRows.getString("CONTENT")).
-                    filmId(reviewRows.getInt("FILM_ID")).
-                    isPositive(reviewRows.getBoolean("IS_POSITIVE")).
-                    userId(reviewRows.getInt("AUTHOR_ID")).
-                    build();
+            Review review = Review.builder().reviewId(reviewId)
+                    .content(reviewRows.getString("CONTENT"))
+                    .filmId(reviewRows.getInt("FILM_ID"))
+                    .isPositive(reviewRows.getBoolean("IS_POSITIVE"))
+                    .userId(reviewRows.getInt("AUTHOR_ID"))
+                    .build();
             setUseful(review);
             log.info("GET REVIEW " + review);
             return review;
@@ -165,21 +165,21 @@ public class ReviewStorage {
         if (filmId != null) {
             sqlReview = "select * from REVIEW where FILM_ID = ?";
             reviews = jdbcTemplate.query(sqlReview, (reviewRows, rowNum) -> Review.builder().
-                    reviewId(reviewRows.getInt("REVIEW_ID")).
-                    content(reviewRows.getString("CONTENT")).
-                    filmId(reviewRows.getInt("FILM_ID")).
-                    isPositive(reviewRows.getBoolean("IS_POSITIVE")).
-                    userId(reviewRows.getInt("AUTHOR_ID")).
-                    build(), filmId
+                    reviewId(reviewRows.getInt("REVIEW_ID"))
+                    .content(reviewRows.getString("CONTENT"))
+                    .filmId(reviewRows.getInt("FILM_ID"))
+                    .isPositive(reviewRows.getBoolean("IS_POSITIVE"))
+                    .userId(reviewRows.getInt("AUTHOR_ID"))
+                    .build(), filmId
             );
         } else {
             sqlReview = "select * from REVIEW";
             reviews = jdbcTemplate.query(sqlReview, (reviewRows, rowNum) -> Review.builder().
-                    reviewId(reviewRows.getInt("REVIEW_ID")).
-                    content(reviewRows.getString("CONTENT")).
-                    filmId(reviewRows.getInt("FILM_ID")).
-                    isPositive(reviewRows.getBoolean("IS_POSITIVE")).
-                    userId(reviewRows.getInt("AUTHOR_ID")).
+                    reviewId(reviewRows.getInt("REVIEW_ID"))
+                    .content(reviewRows.getString("CONTENT"))
+                    .filmId(reviewRows.getInt("FILM_ID"))
+                    .isPositive(reviewRows.getBoolean("IS_POSITIVE"))
+                    .userId(reviewRows.getInt("AUTHOR_ID")).
                     build()
             );
         }
