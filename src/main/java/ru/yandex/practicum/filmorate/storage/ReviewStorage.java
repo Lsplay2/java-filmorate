@@ -164,8 +164,8 @@ public class ReviewStorage {
         List<Review> reviews;
         if (filmId != null) {
             sqlReview = "select * from REVIEW where FILM_ID = ?";
-            reviews = jdbcTemplate.query(sqlReview, (reviewRows, rowNum) -> Review.builder().
-                    reviewId(reviewRows.getInt("REVIEW_ID"))
+            reviews = jdbcTemplate.query(sqlReview, (reviewRows, rowNum) -> Review.builder()
+                    .reviewId(reviewRows.getInt("REVIEW_ID"))
                     .content(reviewRows.getString("CONTENT"))
                     .filmId(reviewRows.getInt("FILM_ID"))
                     .isPositive(reviewRows.getBoolean("IS_POSITIVE"))
@@ -174,13 +174,13 @@ public class ReviewStorage {
             );
         } else {
             sqlReview = "select * from REVIEW";
-            reviews = jdbcTemplate.query(sqlReview, (reviewRows, rowNum) -> Review.builder().
-                    reviewId(reviewRows.getInt("REVIEW_ID"))
+            reviews = jdbcTemplate.query(sqlReview, (reviewRows, rowNum) -> Review.builder()
+                    .reviewId(reviewRows.getInt("REVIEW_ID"))
                     .content(reviewRows.getString("CONTENT"))
                     .filmId(reviewRows.getInt("FILM_ID"))
                     .isPositive(reviewRows.getBoolean("IS_POSITIVE"))
-                    .userId(reviewRows.getInt("AUTHOR_ID")).
-                    build()
+                    .userId(reviewRows.getInt("AUTHOR_ID"))
+                    .build()
             );
         }
         log.info("GET REVIEWS " + reviews);
