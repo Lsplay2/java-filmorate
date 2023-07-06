@@ -49,6 +49,12 @@ public class FilmController {
         return filmTemp;
     }
 
+    @DeleteMapping(value = "/{id}")
+    public void delFilm(@PathVariable int id) throws NotFoundException {
+        filmService.delFilm(id);
+        log.info("Фильм удален. Текущее число фильмов:" + filmService.getAll().size());
+    }
+
     @PutMapping(value = "/{id}/like/{userId}")
     public Film addLike(@PathVariable int id,
                         @PathVariable int userId) throws NotFoundException {
@@ -71,5 +77,11 @@ public class FilmController {
            return new ArrayList<>(filmService.getTopFilm(10));
         }
         return new ArrayList<>(filmService.getTopFilm(count));
+    }
+
+    @GetMapping(value = "/common")
+    public List<Film> getCommonFilms(@RequestParam Integer userId, @RequestParam Integer friendId) {
+        log.info("Поступил запрос на получение общих фильмов у пользователей {} и {}.", userId, friendId);
+        return filmService.getCommonFilms(userId, friendId);
     }
 }

@@ -195,4 +195,13 @@ public class UserDbStorage implements UserStorage {
         common.retainAll(second);
         return common;
     }
+
+    public void delUser(int id) {
+        String sqlQuerry1 = "delete from USER_FILM where USER_ID = ?";
+        jdbcTemplate.update(sqlQuerry1, id);
+        String sqlQuerry2 = "delete from USER_FRIEND where USER_ID = ? OR FRIEND_ID = ?";
+        jdbcTemplate.update(sqlQuerry2, id, id);
+        String sqlQuerry3 = "delete from USERS where USER_ID = ?";
+        jdbcTemplate.update(sqlQuerry3, id);
+    }
 }
