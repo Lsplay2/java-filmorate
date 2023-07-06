@@ -5,7 +5,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
 
 import java.util.List;
@@ -20,34 +19,32 @@ public class ReviewStorage {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public Review create(Review review) throws NotFoundException, ValidationException {
-        validateReview(review);
+    public Review create(Review review) throws NotFoundException {
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from FILM where FILM_ID = ?",
                 review.getFilmId());
         SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from USERS where USER_ID = ?",
                 review.getUserId());
         if (filmRows.next() && userRows.next()) {
-        String sqlQuery = "insert into REVIEW(FILM_ID, IS_POSITIVE, CONTENT, AUTHOR_ID) " +
-                "values (?, ?, ?, ?)";
+            String sqlQuery = "insert into REVIEW(FILM_ID, IS_POSITIVE, CONTENT, AUTHOR_ID) " +
+                    "values (?, ?, ?, ?)";
 
-        jdbcTemplate.update(sqlQuery,
-                review.getFilmId(),
-                review.getIsPositive(),
-                review.getContent(),
-                review.getUserId()
-        );
-        SqlRowSet sqlRows = jdbcTemplate.queryForRowSet("select count(*) as last_id from REVIEW");
-        sqlRows.next();
-        review.setReviewId(sqlRows.getInt("last_id"));
-        log.info("CREATE " + review);
-        return review;
+            jdbcTemplate.update(sqlQuery,
+                    review.getFilmId(),
+                    review.getIsPositive(),
+                    review.getContent(),
+                    review.getUserId()
+            );
+            SqlRowSet sqlRows = jdbcTemplate.queryForRowSet("select count(REVIEW_ID) as last_id from REVIEW");
+            sqlRows.next();
+            review.setReviewId(sqlRows.getInt("last_id"));
+            log.info("CREATE " + review);
+            return review;
         } else {
             throw new NotFoundException("нет такого фильма");
         }
     }
 
-    public Review update(Review review) throws NotFoundException, ValidationException {
-        validateReview(review);
+    public Review update(Review review) throws NotFoundException {
         SqlRowSet reviewRows = jdbcTemplate.queryForRowSet("select * from REVIEW where REVIEW_ID = ?",
                 review.getReviewId());
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from FILM where FILM_ID = ?",
@@ -55,16 +52,6 @@ public class ReviewStorage {
         SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from USERS where USER_ID = ?",
                 review.getUserId());
         if (reviewRows.next() && filmRows.next() && userRows.next()) {
-            /*String sqlQuery = "update REVIEW set " +
-                    "FILM_ID = ?, IS_POSITIVE = ?, CONTENT = ? , AUTHOR_ID = ?" +
-                    "where REVIEW_ID = ?";
-            jdbcTemplate.update(sqlQuery,
-                    review.getFilmId(),
-                    review.getIsPositive(),
-                    review.getContent(),
-                    review.getUserId(),
-                    review.getReviewId()
-            );*/
             String sqlQuery = "update REVIEW set " +
                     "IS_POSITIVE = ?, CONTENT = ? " +
                     "where REVIEW_ID = ?";
@@ -118,7 +105,7 @@ public class ReviewStorage {
                         isLike
                 );
             }
-        } else if(isUser) {
+        } else if (isUser) {
             throw new NotFoundException("нет такого ревью");
         } else {
             throw new NotFoundException("нет такого пользователя");
@@ -147,7 +134,7 @@ public class ReviewStorage {
                         isLike
                 );
             }
-        } else if(isUser) {
+        } else if (isUser) {
             throw new NotFoundException("нет такого ревью");
         } else {
             throw new NotFoundException("нет такого пользователя");
@@ -157,7 +144,7 @@ public class ReviewStorage {
     public Review getReview(Integer reviewId) throws NotFoundException {
         SqlRowSet reviewRows = jdbcTemplate.queryForRowSet("select * from REVIEW where REVIEW_ID = ?",
                 reviewId);
-        if (reviewRows.next()){
+        if (reviewRows.next()) {
             Review review = Review.builder().reviewId(reviewId).
                     content(reviewRows.getString("CONTENT")).
                     filmId(reviewRows.getInt("FILM_ID")).
@@ -178,13 +165,13 @@ public class ReviewStorage {
         if (filmId != null) {
             sqlReview = "select * from REVIEW where FILM_ID = ?";
             reviews = jdbcTemplate.query(sqlReview, (reviewRows, rowNum) -> Review.builder().
-                        reviewId(reviewRows.getInt("REVIEW_ID")).
-                        content(reviewRows.getString("CONTENT")).
-                        filmId(reviewRows.getInt("FILM_ID")).
-                        isPositive(reviewRows.getBoolean("IS_POSITIVE")).
-                        userId(reviewRows.getInt("AUTHOR_ID")).
-                        build(), filmId
-                );
+                    reviewId(reviewRows.getInt("REVIEW_ID")).
+                    content(reviewRows.getString("CONTENT")).
+                    filmId(reviewRows.getInt("FILM_ID")).
+                    isPositive(reviewRows.getBoolean("IS_POSITIVE")).
+                    userId(reviewRows.getInt("AUTHOR_ID")).
+                    build(), filmId
+            );
         } else {
             sqlReview = "select * from REVIEW";
             reviews = jdbcTemplate.query(sqlReview, (reviewRows, rowNum) -> Review.builder().
@@ -214,15 +201,5 @@ public class ReviewStorage {
         dislikesRows.next();
         review.setUseful(likesRows.getInt("LIKES") - dislikesRows.getInt("DISLIKES"));
         log.info("USEFUL " + review);
-    }
-
-    private void validateReview(Review review) throws ValidationException {
-        if(review.getUserId() == null) {
-            throw new ValidationException("проблема в userId");
-        } else if (review.getContent() == null) {
-            throw new ValidationException("может стоит что-нибудь написать?");
-        } else if (review.getFilmId() == null) {
-            throw new ValidationException("на что обзор?");
-        }
     }
 }

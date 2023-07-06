@@ -15,7 +15,8 @@ import java.util.List;
 @Slf4j
 public class ReviewController {
 
-    @Autowired private final ReviewService reviewService;
+    @Autowired
+    private final ReviewService reviewService;
 
     @Autowired
     public ReviewController(ReviewService reviewService) {

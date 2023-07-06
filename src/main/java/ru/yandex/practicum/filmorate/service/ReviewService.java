@@ -15,7 +15,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ReviewService {
 
-    @Autowired private final ReviewStorage reviewStorage;
+    @Autowired
+    private final ReviewStorage reviewStorage;
 
     @Autowired
     public ReviewService(ReviewStorage reviewStorage) {
@@ -23,10 +24,12 @@ public class ReviewService {
     }
 
     public Review create(Review review) throws NotFoundException, ValidationException {
+        validateReview(review);
         return reviewStorage.create(review);
     }
 
     public Review update(Review review) throws NotFoundException, ValidationException {
+        validateReview(review);
         return reviewStorage.update(review);
     }
 
@@ -51,5 +54,17 @@ public class ReviewService {
 
     public Review getReview(Integer reviewId) throws NotFoundException {
         return reviewStorage.getReview(reviewId);
+    }
+
+    private void validateReview(Review review) throws ValidationException {
+        if (review.getIsPositive() == null) {
+            throw new ValidationException("Должна быть оценка");
+        } else if (review.getUserId() == null) {
+            throw new ValidationException("проблема в userId");
+        } else if (review.getContent() == null) {
+            throw new ValidationException("может стоит что-нибудь написать?");
+        } else if (review.getFilmId() == null) {
+            throw new ValidationException("на что обзор?");
+        }
     }
 }
