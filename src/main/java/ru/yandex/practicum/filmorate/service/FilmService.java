@@ -7,13 +7,12 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -77,8 +76,31 @@ public class FilmService {
         }
     }
 
-    public List<Film> getTopFilm(Integer count) {
-        List<Film> films = new ArrayList<>(filmStorage.get().values());
+    public List<Film> getTopFilmByGenreOrYear(Integer count, int genreId, int year) {
+        Set<Film> films = new HashSet<>();
+        if (genreId != 0 && year != 0) {
+            for (Film film : findFilmByGenre(genreId)) {
+                if (film.getReleaseDate().getYear() == year) {
+                    films.add(film);
+                }
+            }
+            for (Film film : findFilmByYear(year)) {
+                for (Genre genre : film.getGenres()) {
+                    if (genre.getId() == genreId) {
+                        films.add(film);
+                    }
+                }
+            }
+        } else if (genreId != 0 && year == 0) {
+            films.addAll(findFilmByGenre(genreId));
+
+        } else if (genreId == 0 && year != 0) {
+            films.addAll(findFilmByYear(year));
+
+        } else {
+            films.addAll(findFilmWithoutAll());
+        }
+
         return films.stream()
                 .sorted((Comparator.comparing(Film::getNumOfLike)).reversed())
                 .limit(count)
@@ -114,4 +136,26 @@ public class FilmService {
         return filmStorage.getCommonFilms(userId, friendId);
     }
 
+    private List<Film> findFilmByYear(int year) {
+        List<Film> films = new ArrayList<>();
+        for(Film film : filmStorage.get().values()) {
+            if(film.getReleaseDate().getYear() == year) {
+                films.add(film);
+            }
+        }
+        System.out.println(films);
+        return films;
+    }
+
+    private List<Film> findFilmByGenre(int genreId) {
+        List<Film> films = filmStorage.findFilmsByGenre(genreId);
+        System.out.println(films);
+        return films;
+    }
+
+    private List<Film> findFilmWithoutAll() {
+        List<Film> films = new ArrayList<>(filmStorage.get().values());
+        System.out.println(films);
+        return films;
+    }
 }

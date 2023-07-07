@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -72,11 +71,11 @@ public class FilmController {
     }
 
     @GetMapping(value = "/popular")
-    public List<Film> getTop(@RequestParam(defaultValue = "10") Integer count) {
-        if (count <= 0) {
-           return new ArrayList<>(filmService.getTopFilm(10));
-        }
-        return new ArrayList<>(filmService.getTopFilm(count));
+    public List<Film> getTop(@RequestParam(defaultValue = "10") Integer count,
+                             @RequestParam(defaultValue = "0") int genreId,
+                             @RequestParam(defaultValue = "0") int year) {
+        System.out.println(genreId+ " " + count+ " " + year);
+        return filmService.getTopFilmByGenreOrYear(count, genreId, year);
     }
 
     @GetMapping(value = "/common")
