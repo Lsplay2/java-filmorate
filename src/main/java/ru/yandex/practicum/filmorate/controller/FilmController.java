@@ -74,7 +74,6 @@ public class FilmController {
     public List<Film> getTop(@RequestParam(defaultValue = "10") Integer count,
                              @RequestParam(defaultValue = "0") int genreId,
                              @RequestParam(defaultValue = "0") int year) {
-        System.out.println(genreId+ " " + count+ " " + year);
         return filmService.getTopFilmByGenreOrYear(count, genreId, year);
     }
 
