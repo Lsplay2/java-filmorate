@@ -138,24 +138,19 @@ public class FilmService {
 
     private List<Film> findFilmByYear(int year) {
         List<Film> films = new ArrayList<>();
-        for(Film film : filmStorage.get().values()) {
-            if(film.getReleaseDate().getYear() == year) {
+        for (Film film : filmStorage.get().values()) {
+            if (film.getReleaseDate().getYear() == year) {
                 films.add(film);
             }
         }
-        System.out.println(films);
         return films;
     }
 
     private List<Film> findFilmByGenre(int genreId) {
-        List<Film> films = filmStorage.findFilmsByGenre(genreId);
-        System.out.println(films);
-        return films;
+        return filmStorage.findFilmsByGenre(genreId);
     }
 
     private List<Film> findFilmWithoutAll() {
-        List<Film> films = new ArrayList<>(filmStorage.get().values());
-        System.out.println(films);
-        return films;
+        return new ArrayList<>(filmStorage.get().values());
     }
 }
