@@ -154,6 +154,7 @@ public class FilmService {
 
     private List<Film> findFilmWithoutAll() {
         return new ArrayList<>(filmStorage.get().values());
+    }
 
     public List<Film> getSearch(String query, Boolean isTitle, Boolean isDirector) {
         List<Film> films = new ArrayList<>(filmStorage.get().values());
