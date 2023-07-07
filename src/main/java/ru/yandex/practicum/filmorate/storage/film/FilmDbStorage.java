@@ -193,6 +193,16 @@ public class FilmDbStorage implements FilmStorage {
         return genres;
     }
 
+    public List<Film> findFilmsByGenre(int genreId) {
+        String sqlQuerry = "select FILM_ID from GENRE_FILM where GENRE_ID = ?";
+        List<Integer> filmsId = jdbcTemplate.query(sqlQuerry, this::mapRowToFilmId, genreId);
+        List<Film> films = new ArrayList<>();
+        for (Integer filmId : filmsId) {
+            films.add(getById(filmId));
+        }
+        return films;
+    }
+
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
         return User.builder()
