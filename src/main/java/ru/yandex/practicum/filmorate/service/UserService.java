@@ -69,7 +69,7 @@ public class UserService {
         if (userId != 0 && friendId != 0) {
             userStorage.delFriendFromUser(userId, friendId);
         }
-        eventService.createEvent(userId, EventType.FRIEND, EventOperation.ADD, friendId);
+        eventService.createEvent(userId, EventType.FRIEND, EventOperation.REMOVE, friendId);
     }
 
     public List<User> getFriendList(int userId) throws NotFoundException {
