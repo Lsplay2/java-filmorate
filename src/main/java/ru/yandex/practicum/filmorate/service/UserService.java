@@ -20,11 +20,11 @@ import java.util.List;
 @Service
 public class UserService {
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
-    private UserDbStorage userStorage;
-    private EventService eventService;
+    private final UserDbStorage userStorage;
+    private final EventService eventService;
 
     @Autowired
-    public UserService(UserDbStorage userStorage) {
+    public UserService(UserDbStorage userStorage, EventService eventService) {
         this.userStorage = userStorage;
         this.eventService = eventService;
     }

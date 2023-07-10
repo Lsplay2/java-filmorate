@@ -10,6 +10,8 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.feed.Event;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.service.EventService;
+
 
 import java.util.List;
 
@@ -18,13 +20,15 @@ import java.util.List;
 public class UserController {
 
     public final UserService userService;
+    private final EventService eventService;
 
 
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, EventService eventService) {
         this.userService = userService;
+        this.eventService = eventService;
     }
 
     @GetMapping

@@ -23,7 +23,7 @@ public class ReviewService {
     private EventService eventService;
 
     @Autowired
-    public ReviewService(ReviewStorage reviewStorage) {
+    public ReviewService(ReviewStorage reviewStorage,  EventService eventService) {
 
         this.reviewStorage = reviewStorage;
         this.eventService = eventService;
