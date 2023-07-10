@@ -108,6 +108,7 @@ public class UserController {
     public List<Film> getRecommendations(@PathVariable int id) throws NotFoundException {
         return userService.getRecommendations(id);
     }
+
     @GetMapping(value = "/{id}/feed")
     public List<Event> getFeed(@PathVariable int id) throws NotFoundException {
         return userService.getFeed(id);
