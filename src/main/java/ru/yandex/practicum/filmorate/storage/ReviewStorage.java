@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @Slf4j
@@ -44,7 +45,7 @@ public class ReviewStorage {
         }
     }
 
-    public Review update(Review review) throws NotFoundException {
+    public Optional<Review> update(Review review) throws NotFoundException {
         SqlRowSet reviewRows = jdbcTemplate.queryForRowSet("select * from REVIEW where REVIEW_ID = ?",
                 review.getReviewId());
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from FILM where FILM_ID = ?",
@@ -61,7 +62,7 @@ public class ReviewStorage {
                     review.getReviewId()
             );
             log.info("UPDATE " + getReview(review.getReviewId()));
-            return getReview(review.getReviewId());
+            return Optional.ofNullable(getReview(review.getReviewId()));
         } else {
             throw new NotFoundException("мертвое умереть не может");
         }

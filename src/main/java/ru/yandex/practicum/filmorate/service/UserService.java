@@ -8,6 +8,9 @@ import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.feed.Event;
+import ru.yandex.practicum.filmorate.model.feed.EventOperation;
+import ru.yandex.practicum.filmorate.model.feed.EventType;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
 import java.time.LocalDate;
@@ -17,11 +20,13 @@ import java.util.List;
 @Service
 public class UserService {
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
-    private UserDbStorage userStorage;
+    private final UserDbStorage userStorage;
+    private final EventService eventService;
 
     @Autowired
-    public UserService(UserDbStorage userStorage) {
+    public UserService(UserDbStorage userStorage, EventService eventService) {
         this.userStorage = userStorage;
+        this.eventService = eventService;
     }
 
     public User getById(int id) throws NotFoundException {
@@ -56,6 +61,7 @@ public class UserService {
         if (userId != 0 && friendId != 0) {
             userStorage.addUserToFriend(userId, friendId);
         }
+        eventService.createEvent(userId, EventType.FRIEND, EventOperation.ADD, friendId);
     }
 
     public void delFriend(int userId, int friendId) throws NotFoundException {
@@ -63,6 +69,7 @@ public class UserService {
         if (userId != 0 && friendId != 0) {
             userStorage.delFriendFromUser(userId, friendId);
         }
+        eventService.createEvent(userId, EventType.FRIEND, EventOperation.REMOVE, friendId);
     }
 
     public List<User> getFriendList(int userId) throws NotFoundException {
@@ -97,6 +104,11 @@ public class UserService {
     public List<Film> getRecommendations(int id) throws NotFoundException {
         validateAtGetId(id);
         return userStorage.getRecommendations(id);
+    }
+
+    public List<Event> getFeed(Integer userId) throws NotFoundException {
+        getById(userId);
+        return eventService.getFeed(userId);
     }
 
     private void validate(User user) throws ValidationException {
