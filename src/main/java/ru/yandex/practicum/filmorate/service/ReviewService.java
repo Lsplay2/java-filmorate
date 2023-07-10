@@ -50,8 +50,8 @@ public class ReviewService {
     }
 
     public void delete(Integer reviewId) throws NotFoundException {
-        reviewStorage.delete(reviewId);
         Review review = getReview(reviewId);
+        reviewStorage.delete(reviewId);
         eventService.createEvent(review.getUserId(), EventType.REVIEW, EventOperation.REMOVE, review.getReviewId());
     }
 
