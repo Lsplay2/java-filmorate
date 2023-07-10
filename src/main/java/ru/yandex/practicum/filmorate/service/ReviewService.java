@@ -6,9 +6,12 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.model.feed.EventOperation;
+import ru.yandex.practicum.filmorate.model.feed.EventType;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,24 +20,39 @@ public class ReviewService {
 
     @Autowired
     private final ReviewStorage reviewStorage;
+    private EventService eventService;
 
     @Autowired
     public ReviewService(ReviewStorage reviewStorage) {
+
         this.reviewStorage = reviewStorage;
+        this.eventService = eventService;
     }
 
     public Review create(Review review) throws NotFoundException, ValidationException {
         validateReview(review);
-        return reviewStorage.create(review);
+        Review reviewCreated = reviewStorage.create(review);
+        eventService.createEvent(reviewCreated.getUserId(), EventType.REVIEW, EventOperation.ADD, reviewCreated.getReviewId());
+        return reviewCreated;
     }
 
     public Review update(Review review) throws NotFoundException, ValidationException {
         validateReview(review);
-        return reviewStorage.update(review);
+        Optional<Review> updatedReview = reviewStorage.update(review);
+
+        if (updatedReview.isPresent()) {
+            Review reviewUpdated = updatedReview.get();
+            eventService.createEvent(reviewUpdated.getUserId(), EventType.REVIEW, EventOperation.UPDATE, reviewUpdated.getReviewId());
+            return reviewUpdated;
+        } else {
+            throw new NotFoundException("Отзыв не найден.");
+        }
     }
 
     public void delete(Integer reviewId) throws NotFoundException {
+        Review review = getReview(reviewId);
         reviewStorage.delete(reviewId);
+        eventService.createEvent(review.getUserId(), EventType.REVIEW, EventOperation.REMOVE, review.getReviewId());
     }
 
     public void addMark(Integer reviewId, Integer userId, Boolean isLike) throws Exception {

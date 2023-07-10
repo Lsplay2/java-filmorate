@@ -9,6 +9,8 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.feed.EventOperation;
+import ru.yandex.practicum.filmorate.model.feed.EventType;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
@@ -23,11 +25,13 @@ public class FilmService {
     private static final Logger log = LoggerFactory.getLogger(FilmService.class);
     private final FilmDbStorage filmStorage;
     private final UserDbStorage userStorage;
+    private final EventService eventService;
 
     @Autowired
-    public FilmService(FilmDbStorage filmStorage, UserDbStorage userStorage) {
+    public FilmService(FilmDbStorage filmStorage, UserDbStorage userStorage, EventService eventService) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
+        this.eventService = eventService;
     }
 
     public Film getById(int id) throws NotFoundException {
@@ -67,6 +71,7 @@ public class FilmService {
                 && userStorage.checkInStorageById(userId)) {
             filmStorage.addUserToFilm(userId, filmId);
         }
+        eventService.createEvent(userId, EventType.LIKE, EventOperation.ADD, filmId);
     }
 
     public void delLike(int filmId, int userId) throws NotFoundException {
@@ -75,6 +80,7 @@ public class FilmService {
                 && userStorage.checkInStorageById(userId)) {
             filmStorage.dellUserToFilm(userId, filmId);
         }
+        eventService.createEvent(userId, EventType.LIKE, EventOperation.REMOVE, filmId);
     }
 
     public List<Film> getTopFilmByGenreOrYear(Integer count, int genreId, int year) {
