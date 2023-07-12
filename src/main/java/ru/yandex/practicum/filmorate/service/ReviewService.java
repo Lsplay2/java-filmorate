@@ -19,15 +19,9 @@ import java.util.stream.Collectors;
 public class ReviewService {
 
     @Autowired
-    private final ReviewStorage reviewStorage;
-    private EventService eventService;
-
+    private ReviewStorage reviewStorage;
     @Autowired
-    public ReviewService(ReviewStorage reviewStorage,  EventService eventService) {
-
-        this.reviewStorage = reviewStorage;
-        this.eventService = eventService;
-    }
+    private EventService eventService;
 
     public Review create(Review review) throws NotFoundException, ValidationException {
         validateReview(review);
