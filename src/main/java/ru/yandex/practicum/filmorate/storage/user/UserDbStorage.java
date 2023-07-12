@@ -213,7 +213,6 @@ public class UserDbStorage implements UserStorage {
                 "GROUP BY l1.user_id, l2.film_id " +
                 "ORDER BY rel DESC) AS r " +
                 "ON r.film_id = f.film_id";
-
         List<Film> recommendations = jdbcTemplate.query(sqlQuery, filmDbStorage::mapRowToFilm, id, id);
         return recommendations;
     }
