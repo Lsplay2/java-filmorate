@@ -118,7 +118,7 @@ public class FilmDbStorage implements FilmStorage {
         return listFilms.size() > 0;
     }
 
-    private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
+    public Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         Film film = Film.builder()
                 .id(resultSet.getInt("FILM_ID"))
                 .name(resultSet.getString("NAME"))

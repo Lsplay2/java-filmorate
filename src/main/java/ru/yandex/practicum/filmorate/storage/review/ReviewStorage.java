@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.review;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -21,9 +21,9 @@ public class ReviewStorage {
     }
 
     public Review create(Review review) throws NotFoundException {
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from FILM where FILM_ID = ?",
+        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select FILM_ID from FILM where FILM_ID = ?",
                 review.getFilmId());
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from USERS where USER_ID = ?",
+        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select USER_ID from USERS where USER_ID = ?",
                 review.getUserId());
         if (filmRows.next() && userRows.next()) {
             String sqlQuery = "insert into REVIEW(FILM_ID, IS_POSITIVE, CONTENT, AUTHOR_ID) " +
@@ -46,11 +46,11 @@ public class ReviewStorage {
     }
 
     public Optional<Review> update(Review review) throws NotFoundException {
-        SqlRowSet reviewRows = jdbcTemplate.queryForRowSet("select * from REVIEW where REVIEW_ID = ?",
+        SqlRowSet reviewRows = jdbcTemplate.queryForRowSet("select REVIEW_ID from REVIEW where REVIEW_ID = ?",
                 review.getReviewId());
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from FILM where FILM_ID = ?",
+        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select FILM_ID from FILM where FILM_ID = ?",
                 review.getFilmId());
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from USERS where USER_ID = ?",
+        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select USER_ID from USERS where USER_ID = ?",
                 review.getUserId());
         if (reviewRows.next() && filmRows.next() && userRows.next()) {
             String sqlQuery = "update REVIEW set " +
@@ -69,7 +69,7 @@ public class ReviewStorage {
     }
 
     public void delete(Integer reviewId) throws NotFoundException {
-        SqlRowSet reviewRows = jdbcTemplate.queryForRowSet("select * from REVIEW where REVIEW_ID = ?",
+        SqlRowSet reviewRows = jdbcTemplate.queryForRowSet("select REVIEW_ID from REVIEW where REVIEW_ID = ?",
                 reviewId);
         if (reviewRows.next()) {
             String sqlQuery = "delete from REVIEW where REVIEW_ID = ?";
@@ -84,14 +84,14 @@ public class ReviewStorage {
     }
 
     public void addMark(Integer reviewId, Integer userId, Boolean isLike) throws Exception {
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from USERS where USER_ID = ?",
+        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select USER_ID from USERS where USER_ID = ?",
                 userId);
-        SqlRowSet reviewRows = jdbcTemplate.queryForRowSet("select * from REVIEW where REVIEW_ID = ?",
+        SqlRowSet reviewRows = jdbcTemplate.queryForRowSet("select REVIEW_ID from REVIEW where REVIEW_ID = ?",
                 reviewId);
-        Boolean isUser = userRows.next();
-        Boolean isReview = reviewRows.next();
-        if (isUser && isReview) {
-            SqlRowSet fullRows = jdbcTemplate.queryForRowSet("select * from REVIEW_LIKES where REVIEW_ID = ?" +
+        Boolean isExistUser = userRows.next();
+        Boolean isExistReview = reviewRows.next();
+        if (isExistUser && isExistReview) {
+            SqlRowSet fullRows = jdbcTemplate.queryForRowSet("select USER_ID from REVIEW_LIKES where REVIEW_ID = ?" +
                             " and USER_ID = ?", reviewId,
                     userId);
             if (fullRows.next()) {
@@ -106,7 +106,7 @@ public class ReviewStorage {
                         isLike
                 );
             }
-        } else if (isUser) {
+        } else if (isExistUser) {
             throw new NotFoundException("нет такого ревью");
         } else {
             throw new NotFoundException("нет такого пользователя");
@@ -114,14 +114,14 @@ public class ReviewStorage {
     }
 
     public void deleteMark(Integer reviewId, Integer userId, Boolean isLike) throws Exception {
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from USERS where USER_ID = ?",
+        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select USER_ID from USERS where USER_ID = ?",
                 userId);
-        SqlRowSet reviewRows = jdbcTemplate.queryForRowSet("select * from REVIEW where REVIEW_ID = ?",
+        SqlRowSet reviewRows = jdbcTemplate.queryForRowSet("select REVIEW_ID from REVIEW where REVIEW_ID = ?",
                 reviewId);
-        Boolean isUser = userRows.next();
-        Boolean isReview = reviewRows.next();
-        if (isUser && isReview) {
-            SqlRowSet fullRows = jdbcTemplate.queryForRowSet("select * from REVIEW_LIKES where REVIEW_ID = ?" +
+        Boolean isExistUser = userRows.next();
+        Boolean isExistReview = reviewRows.next();
+        if (isExistUser && isExistReview) {
+            SqlRowSet fullRows = jdbcTemplate.queryForRowSet("select USER_ID from REVIEW_LIKES where REVIEW_ID = ?" +
                             " and USER_ID = ?", reviewId,
                     userId);
             if (fullRows.next()) {
@@ -135,7 +135,7 @@ public class ReviewStorage {
                         isLike
                 );
             }
-        } else if (isUser) {
+        } else if (isExistUser) {
             throw new NotFoundException("нет такого ревью");
         } else {
             throw new NotFoundException("нет такого пользователя");
