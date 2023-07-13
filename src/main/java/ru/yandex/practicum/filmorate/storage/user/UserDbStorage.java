@@ -204,58 +204,17 @@ public class UserDbStorage implements UserStorage {
     }
 
     public List<Film> getRecommendations(int id) {
-
-        int maxCount = 0;
-        int userIdWithMaxCross = 0;
-        List<Film> recomendations = new ArrayList<>();
-
-        //Заполняем List id фильмов пользователя по которому запрашиваются рекомендации
-        List<Integer> filmIdUser = getIdFilmsListFromUserFilm(id);
-
-        //Создаем List со всеми остальными пользователями поставившими лайки
-        String sqlQuery1 = "select USER_ID from USER_FILM ";
-        List<Integer> userIdWhoStayLike = jdbcTemplate.query(sqlQuery1, this::mapRowToUserIdWhoStayLike);
-
-        //Проходимся циклом по пользователям поставившим лайки
-        for (Integer userId : userIdWhoStayLike) {
-            int count = 0;
-            if (userId == id) {
-                continue;
-            }
-            //Кладем в List фильмы одного пользователя поставившего лайк
-            List<Integer> filmListIdUserWhoStayLike = getIdFilmsListFromUserFilm(userId);
-
-            //Проходим по этому листу циклом и ищем пересечения фильмов, считаем их
-            for (int i = 0; i < filmListIdUserWhoStayLike.size(); i++) {
-                if (filmIdUser.contains(filmListIdUserWhoStayLike.get(i))) {
-                    count++;
-                }
-            }
-            //Находим пользователя с максимальным количеством пересечений по фильмам
-            // с пользователем пользователя по которому запрашиваются рекомендации
-            if (count > maxCount) {
-                maxCount = count;
-                userIdWithMaxCross = userId;
-            }
-        }
-
-        List<Integer> filmIdUserWithMaxCross = new ArrayList<>();
-        //Пишем в filmIdUserWithMaxCross id фильмов по которым нет пересечений:
-        if (userIdWithMaxCross != 0) {
-            filmIdUserWithMaxCross = getIdFilmsListFromUserFilm(userIdWithMaxCross);
-        }
-
-        //Добавляем фильмы в рекомендации
-        for (int i = 0; i < filmIdUserWithMaxCross.size(); i++) {
-            if (!filmIdUser.contains(filmIdUserWithMaxCross.get(i))) {
-                recomendations.add(filmDbStorage.getById(filmIdUserWithMaxCross.get(i)));
-            }
-        }
-        return recomendations;
-    }
-
-    private Integer mapRowToUserIdWhoStayLike(ResultSet resultSet, int rowNum) throws SQLException {
-        return resultSet.getInt("USER_ID");
+        String sqlQuery = "SELECT f.* FROM film f " +
+                "JOIN (SELECT DISTINCT l2.film_id, COUNT(*) rel " +
+                "FROM USER_FILM l1 " +
+                "LEFT JOIN USER_FILM l2 ON l1.user_id = l2.user_id " +
+                "WHERE l1.film_id IN (SELECT film_id FROM USER_FILM WHERE user_id = ?) " +
+                "AND l2.film_id NOT IN (SELECT film_id FROM USER_FILM WHERE user_id = ?) " +
+                "GROUP BY l1.user_id, l2.film_id " +
+                "ORDER BY rel DESC) AS r " +
+                "ON r.film_id = f.film_id";
+        List<Film> recommendations = jdbcTemplate.query(sqlQuery, filmDbStorage::mapRowToFilm, id, id);
+        return recommendations;
     }
 
     private List<Integer> getIdFilmsListFromUserFilm(int id) {

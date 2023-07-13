@@ -25,27 +25,32 @@ public class ReviewController {
 
     @PostMapping
     public Review create(@RequestBody Review review) throws NotFoundException, ValidationException {
+        log.info("Поступил запрос на создание ревью:" + review);
         return reviewService.create(review);
     }
 
     @PutMapping
     public Review update(@RequestBody Review review) throws NotFoundException, ValidationException {
+        log.info("Поступил запрос на обновление ревью:" + review);
         return reviewService.update(review);
     }
 
     @DeleteMapping(value = "/{id}")
     public void deleteReview(@PathVariable int id) throws NotFoundException {
+        log.info("Поступил запрос на удаление ревью:" + id);
         reviewService.delete(id);
     }
 
     @GetMapping(value = "/{id}")
     public Review getReview(@PathVariable int id) throws NotFoundException {
+        log.info("Поступил запрос на получение ревью по id:" + id);
         return reviewService.getReview(id);
     }
 
     @GetMapping
     public List<Review> getTopReviews(@RequestParam(required = false) Integer filmId,
                                       @RequestParam(defaultValue = "10") Integer count) throws NotFoundException {
+        log.info("Поступил запрос на получение топ ревью");
         log.info("filmId = {}, count = {}", filmId, count);
         return reviewService.getTopReviews(filmId, count);
     }

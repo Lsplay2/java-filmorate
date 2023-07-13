@@ -33,23 +33,27 @@ public class UserController {
 
     @GetMapping
     public List<User> getUsers() {
+        log.info("Поступил запрос на получение всех пользователей");
         return userService.getAll();
     }
 
     @GetMapping(value = "/{id}")
     public User getUserById(@PathVariable int id) throws NotFoundException {
+        log.info("Поступил запрос на получение пользователей по id:" + id);
         return userService.getById(id);
     }
 
     @PostMapping
     public User createUser(@RequestBody User user) throws ValidationException, NotFoundException {
+        log.info("Поступил запрос на создание пользователя:" + user);
         userService.createUser(user);
         log.info("Пользователь добавлен в коллекцию:" + user);
         return user;
     }
 
     @PutMapping
-    public User createOrUpdateUser(@RequestBody User user) throws ValidationException, NotFoundException {
+    public User updateUser(@RequestBody User user) throws ValidationException, NotFoundException {
+        log.info("Поступил запрос на обновление пользователя:" + user);
         userService.updateUser(user);
         log.info("Пользователь обновлен в коллекции:" + user);
         return user;
@@ -57,6 +61,7 @@ public class UserController {
 
     @DeleteMapping(value = "/{id}")
     public void delUser(@PathVariable int id) throws NotFoundException {
+        log.info("Поступил запрос на удаление пользователя:" + id);
         userService.delUser(id);
         log.info("Пользователь удален. Текущее число пользователей:" + userService.getAll().size());
     }
@@ -64,7 +69,7 @@ public class UserController {
     @PutMapping(value = "/{id}/friends/{friendId}")
     public User addFriend(@PathVariable int id,
                           @PathVariable int friendId) throws NotFoundException {
-
+        log.info("Поступил запрос на добавление друга");
         userService.addFriend(id, friendId);
         log.info("Пользователь" + id + " добавил друга:" + friendId);
         return userService.getById(id);
@@ -73,6 +78,7 @@ public class UserController {
     @PutMapping(value = "/{id}/friends/{friendId}/confirm")
     public User confirmFriend(@PathVariable int id,
                               @PathVariable int friendId) throws NotFoundException {
+        log.info("Поступил запрос на подтверждение друга");
         userService.confirmFriend(id, friendId);
         log.info("Пользователь" + id + " подтвердил друга:" + friendId);
         return userService.getById(id);
@@ -81,6 +87,7 @@ public class UserController {
     @DeleteMapping(value = "/{id}/friends/{friendId}")
     public User delFriend(@PathVariable int id,
                           @PathVariable int friendId) throws NotFoundException {
+        log.info("Поступил запрос на удаление друга");
         userService.delFriend(id, friendId);
         log.info("Пользователь" + id + " удалил из друзей:" + friendId);
         return userService.getById(id);
@@ -88,33 +95,39 @@ public class UserController {
 
     @GetMapping(value = "/{id}/friends")
     public List<User> getAllFriend(@PathVariable int id) throws NotFoundException {
+        log.info("Поступил запрос на получение всех друзей");
         return userService.getFriendList(id);
     }
 
     @GetMapping(value = "/{id}/friends/common/{otherId}")
     public List<User> getAllSameFriends(@PathVariable int id,
                                         @PathVariable int otherId) throws NotFoundException {
+        log.info("Поступил запрос на получение всех одинаковых с пользователем друзей");
         return userService.getSameFriends(id, otherId);
     }
 
     @GetMapping(value = "/{id}/films")
     public List<Film> getFilmOnUser(@PathVariable int id) {
+        log.info("Поступил запрос на получение всех лайкнутых фильмов");
         return userService.getFilmFromUser(id);
     }
 
     @PostMapping(value = "/{id}/films/{filmId}")
     public User addLikeToFilm(@PathVariable int id,
                               @PathVariable int filmId) throws NotFoundException {
+        log.info("Поступил запрос на лайк фильма от пользователя");
         return userService.addLikeToFilm(id, filmId);
     }
 
     @GetMapping(value = "/{id}/recommendations")
     public List<Film> getRecommendations(@PathVariable int id) throws NotFoundException {
+        log.info("Поступил запрос на получение рекомендаций");
         return userService.getRecommendations(id);
     }
 
     @GetMapping(value = "/{id}/feed")
     public List<Event> getFeed(@PathVariable int id) throws NotFoundException {
+        log.info("Поступил запрос на получение всех событий");
         return userService.getFeed(id);
     }
 }
