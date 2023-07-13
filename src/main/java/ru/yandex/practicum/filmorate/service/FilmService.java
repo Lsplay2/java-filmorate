@@ -162,27 +162,41 @@ public class FilmService {
         return new ArrayList<>(filmStorage.get().values());
     }
 
-    public List<Film> getSearch(String query, Boolean isTitle, Boolean isDirector) {
+    public List<Film> getSearchByTitleDirector(String query) {
+        log.info("GETSEARCH TITLE DIRECTOR query {}", query);
         List<Film> films = new ArrayList<>(filmStorage.get().values());
         return films.stream()
-                .filter(film -> filterForSearch(query, isTitle, isDirector, film))
+                .filter(film -> filterForSearchDirector(query, film) || filterForSearchTitle(query, film))
                 .sorted((Comparator.comparing(Film::getNumOfLike)).reversed())
                 .collect(Collectors.toList());
     }
 
-    private Boolean filterForSearch(String query, Boolean isTitle, Boolean isDirector, Film film) {
-        if (isTitle && isDirector) {
-            List<Director> directors = film.getDirectors();
-            return film.getName().toLowerCase().contains(query.toLowerCase()) || directors.stream()
-                    .filter(director -> director.getName().toLowerCase().contains(query.toLowerCase()))
-                    .toArray().length > 0;
-        } else if (isTitle) {
-            return film.getName().toLowerCase().contains(query.toLowerCase());
-        } else {
-            List<Director> directors = film.getDirectors();
-            return directors.stream()
-                    .filter(director -> director.getName()
-                            .toLowerCase().contains(query.toLowerCase())).toArray().length > 0;
-        }
+    public List<Film> getSearchByTitle(String query) {
+        log.info("GETSEARCH TITLE query {}", query);
+        List<Film> films = new ArrayList<>(filmStorage.get().values());
+        return films.stream()
+                .filter(film -> filterForSearchTitle(query, film))
+                .sorted((Comparator.comparing(Film::getNumOfLike)).reversed())
+                .collect(Collectors.toList());
+    }
+
+    public List<Film> getSearchByDirector(String query) {
+        log.info("GETSEARCH DIRECTOR query {}", query);
+        List<Film> films = new ArrayList<>(filmStorage.get().values());
+        return films.stream()
+                .filter(film -> filterForSearchDirector(query, film))
+                .sorted((Comparator.comparing(Film::getNumOfLike)).reversed())
+                .collect(Collectors.toList());
+    }
+
+    private Boolean filterForSearchDirector(String query, Film film) {
+        List<Director> directors = film.getDirectors();
+        return directors.stream()
+                .filter(director -> director.getName()
+                        .toLowerCase().contains(query.toLowerCase())).toArray().length > 0;
+    }
+
+    private Boolean filterForSearchTitle(String query, Film film) {
+        return film.getName().toLowerCase().contains(query.toLowerCase());
     }
 }
