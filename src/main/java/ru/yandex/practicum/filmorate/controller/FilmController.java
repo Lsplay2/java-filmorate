@@ -85,14 +85,6 @@ public class FilmController {
 
     @GetMapping(value = "/search")
     public List<Film> getSearchedFilms(@RequestParam String query, @RequestParam String by) {
-        if (by.equals("director")) {
-            return filmService.getSearchByDirector(query);
-        } else if (by.equals("title")) {
-            return filmService.getSearchByTitle(query);
-        } else if (by.equals("director,title") || by.equals("title,director")) {
-            return filmService.getSearchByTitleDirector(query);
-        } else {
-            return null;
-        }
+        return filmService.getSearchedFilms(query, by);
     }
 }

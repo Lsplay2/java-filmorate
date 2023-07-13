@@ -162,7 +162,20 @@ public class FilmService {
         return new ArrayList<>(filmStorage.get().values());
     }
 
-    public List<Film> getSearchByTitleDirector(String query) {
+    public List<Film> getSearchedFilms(String query, String by) {
+        log.info("SERVICE getSearchedFilms query {}, by {}", query, by);
+        if (by.equals("director")) {
+            return getSearchByDirector(query);
+        } else if (by.equals("title")) {
+            return getSearchByTitle(query);
+        } else if (by.equals("director,title") || by.equals("title,director")) {
+            return getSearchByTitleDirector(query);
+        } else {
+            return null;
+        }
+    }
+
+    private List<Film> getSearchByTitleDirector(String query) {
         log.info("GETSEARCH TITLE DIRECTOR query {}", query);
         List<Film> films = new ArrayList<>(filmStorage.get().values());
         return films.stream()
@@ -171,7 +184,7 @@ public class FilmService {
                 .collect(Collectors.toList());
     }
 
-    public List<Film> getSearchByTitle(String query) {
+    private List<Film> getSearchByTitle(String query) {
         log.info("GETSEARCH TITLE query {}", query);
         List<Film> films = new ArrayList<>(filmStorage.get().values());
         return films.stream()
@@ -180,7 +193,7 @@ public class FilmService {
                 .collect(Collectors.toList());
     }
 
-    public List<Film> getSearchByDirector(String query) {
+    private List<Film> getSearchByDirector(String query) {
         log.info("GETSEARCH DIRECTOR query {}", query);
         List<Film> films = new ArrayList<>(filmStorage.get().values());
         return films.stream()
