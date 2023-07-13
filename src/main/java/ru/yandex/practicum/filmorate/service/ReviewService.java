@@ -17,15 +17,12 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class ReviewService {
-    private final ReviewStorage reviewStorage;
-    private EventService eventService;
 
     @Autowired
-    public ReviewService(ReviewStorage reviewStorage, EventService eventService) {
+    private ReviewStorage reviewStorage;
+    @Autowired
+    private EventService eventService;
 
-        this.reviewStorage = reviewStorage;
-        this.eventService = eventService;
-    }
 
     public Review create(Review review) throws NotFoundException, ValidationException {
         validateReview(review);
