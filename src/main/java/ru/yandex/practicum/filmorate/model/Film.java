@@ -45,4 +45,12 @@ public class Film {
     public int getNumOfLike() {
         return numOfLike;
     }
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinTable(name = "DIRECTOR_FILM",
+            joinColumns = {
+                    @JoinColumn(name = "FILM_ID", referencedColumnName = "FILM_ID")},
+            inverseJoinColumns = {
+                    @JoinColumn(name = "DIRECTOR_ID", referencedColumnName = "DIRECTOR_ID")})
+    private List<Director> directors = new ArrayList<>();
 }

@@ -28,7 +28,7 @@ public class UserDbStorage implements UserStorage {
         if (checkInStorageById(user.getId())) {
             String sqlQuery = "update USERS set " +
                     "NAME = ?, EMAIL = ?, LOGIN = ?, BIRTHDAY = ? where USER_ID = ?";
-            jdbcTemplate.update(sqlQuery, user.getName(),user.getEmail(), user.getLogin(),
+            jdbcTemplate.update(sqlQuery, user.getName(), user.getEmail(), user.getLogin(),
                     user.getBirthday(), user.getId());
         } else {
             if (user.getId() == 0) {
@@ -102,7 +102,7 @@ public class UserDbStorage implements UserStorage {
         return user;
     }
 
-        public void addUserToFilm(int userId, int filmId) {
+    public void addUserToFilm(int userId, int filmId) {
         String sqlQuerry = "insert into USER_FILM(USER_ID, FILM_ID)" +
                 "values (?, ?)";
         jdbcTemplate.update(sqlQuerry, userId, filmId);
@@ -115,9 +115,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     public List<Film> findFilmOnUsers(int userId) {
-        String sqlQuery = "select FILM_ID " +
-                "from USER_FILM where USER_ID = ?";
-        List<Integer> filmId = jdbcTemplate.query(sqlQuery,this::mapRowToFilmId, userId);
+        List<Integer> filmId = getIdFilmsListFromUserFilm(userId);
         List<Film> films = new ArrayList<>();
         for (Integer id : filmId) {
             films.add(getFilmById(id));
@@ -127,12 +125,12 @@ public class UserDbStorage implements UserStorage {
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         return Film.builder()
-                 .id(resultSet.getInt("FILM_ID"))
-                 .name(resultSet.getString("NAME"))
-                 .releaseDate(resultSet.getDate("RELEASEDATE").toLocalDate())
-                 .description(resultSet.getString("DESCRIPTION"))
-                 .duration(resultSet.getInt("DURATION"))
-                 .build();
+                .id(resultSet.getInt("FILM_ID"))
+                .name(resultSet.getString("NAME"))
+                .releaseDate(resultSet.getDate("RELEASEDATE").toLocalDate())
+                .description(resultSet.getString("DESCRIPTION"))
+                .duration(resultSet.getInt("DURATION"))
+                .build();
     }
 
     private Integer mapRowToFilmId(ResultSet resultSet, int rowNum) throws SQLException {
@@ -151,18 +149,18 @@ public class UserDbStorage implements UserStorage {
     }
 
     public void delFriendFromUser(int userId, int friendId) {
-        String  sqlQuerry = "delete from USER_FRIEND where USER_ID = ? and FRIEND_ID = ?";
+        String sqlQuerry = "delete from USER_FRIEND where USER_ID = ? and FRIEND_ID = ?";
         jdbcTemplate.update(sqlQuerry, userId, friendId);
     }
 
     public List<User> findFriendOnUsers(int userId) {
         String sqlQuery = "select FRIEND_ID " +
                 "from USER_FRIEND where USER_ID = ?";
-        List<Integer> usersId = jdbcTemplate.query(sqlQuery,this::mapRowToUserId, userId);
+        List<Integer> usersId = jdbcTemplate.query(sqlQuery, this::mapRowToUserId, userId);
 
         String sqlQuery2 = "select USER_ID " +
                 "from USER_FRIEND where FRIEND_ID = ? AND CONFIRM ";
-        List<Integer> usersId2 = jdbcTemplate.query(sqlQuery2,this::mapRowToFriendId, userId);
+        List<Integer> usersId2 = jdbcTemplate.query(sqlQuery2, this::mapRowToFriendId, userId);
 
         usersId.addAll(usersId2);
         List<User> users = new ArrayList<>();
@@ -187,12 +185,40 @@ public class UserDbStorage implements UserStorage {
     public List<User> getSame(int userId, int friendId) {
         List<User> userFriends = findFriendOnUsers(userId);
         List<User> friendFriends = findFriendOnUsers(friendId);
-        return checkSame(userFriends,friendFriends);
+        return checkSame(userFriends, friendFriends);
     }
 
-    private static  List<User> checkSame(List<User> first, List<User> second) {
+    private static List<User> checkSame(List<User> first, List<User> second) {
         List<User> common = new ArrayList<>(first);
         common.retainAll(second);
         return common;
+    }
+
+    public void delUser(int id) {
+        String sqlQuerry1 = "delete from USER_FILM where USER_ID = ?";
+        jdbcTemplate.update(sqlQuerry1, id);
+        String sqlQuerry2 = "delete from USER_FRIEND where USER_ID = ? OR FRIEND_ID = ?";
+        jdbcTemplate.update(sqlQuerry2, id, id);
+        String sqlQuerry3 = "delete from USERS where USER_ID = ?";
+        jdbcTemplate.update(sqlQuerry3, id);
+    }
+
+    public List<Film> getRecommendations(int id) {
+        String sqlQuery = "SELECT f.* FROM film f " +
+                "JOIN (SELECT DISTINCT l2.film_id, COUNT(*) rel " +
+                "FROM USER_FILM l1 " +
+                "LEFT JOIN USER_FILM l2 ON l1.user_id = l2.user_id " +
+                "WHERE l1.film_id IN (SELECT film_id FROM USER_FILM WHERE user_id = ?) " +
+                "AND l2.film_id NOT IN (SELECT film_id FROM USER_FILM WHERE user_id = ?) " +
+                "GROUP BY l1.user_id, l2.film_id " +
+                "ORDER BY rel DESC) AS r " +
+                "ON r.film_id = f.film_id";
+        List<Film> recommendations = jdbcTemplate.query(sqlQuery, filmDbStorage::mapRowToFilm, id, id);
+        return recommendations;
+    }
+
+    private List<Integer> getIdFilmsListFromUserFilm(int id) {
+        String sqlQuery = "select FILM_ID from USER_FILM where USER_ID = ?";
+        return jdbcTemplate.query(sqlQuery, this::mapRowToFilmId, id);
     }
 }
