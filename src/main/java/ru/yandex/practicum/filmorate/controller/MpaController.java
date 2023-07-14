@@ -28,16 +28,19 @@ public class MpaController {
 
     @GetMapping(value = "/mpa")
     public List<Rating> getRaing() {
+        log.info("Поступил запрос на получение всех рейтингов");
         return mpaService.getAll();
     }
 
     @GetMapping(value = "/mpa/{id}")
     public Rating getRaingById(@PathVariable int id) throws NotFoundException {
+        log.info("Поступил запрос на получение рейтинга по id:" + id);
         return mpaService.getById(id);
     }
 
     @PostMapping(value = "/mpa/{name}")
     public String createRating(@PathVariable String name) throws ValidationException {
+        log.info("Поступил запрос на создание рейтинга:" + name);
         mpaService.createRating(name);
         log.info("Рейтинг добавлен в коллекцию:" + name);
         return name;
@@ -46,6 +49,7 @@ public class MpaController {
     @PostMapping(value = "/films/{filmId}/mpa/{ratingId}")
     public String addRatingToFilm(@PathVariable int filmId,
                                   @PathVariable int ratingId) throws NotFoundException {
+        log.info("Поступил запрос на добавление рейтинга " + ratingId + " к фильму " + filmId);
         mpaService.addRatingToFilm(filmId, ratingId);
         log.info("Рейтинг добавлен к фильму");
         return "Success";

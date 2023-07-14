@@ -27,16 +27,19 @@ public class GenreController {
 
     @GetMapping(value = "/genres")
     public List<Genre> getGenre() {
+        log.info("Поступил запрос на получение всех жанров");
         return genreService.getAll();
     }
 
     @GetMapping(value = "/genres/{id}")
     public Genre getGenreById(@PathVariable int id) throws NotFoundException {
+        log.info("Поступил запрос на получение жанра по id:" + id);
         return genreService.getGenreById(id);
     }
 
     @PostMapping(value = "/genres/{name}")
     public String createGenre(@PathVariable String name) throws ValidationException {
+        log.info("Поступил запрос на создание жанра:" + name);
         genreService.createGenre(name);
         log.info("Жанр добавлен в коллекцию:" + name);
         return name;
@@ -45,6 +48,7 @@ public class GenreController {
     @PostMapping(value = "/films/{filmId}/genres/{genreId}")
     public Film addGenreToFilm(@PathVariable int filmId,
                                @PathVariable int genreId) throws NotFoundException {
+        log.info("Поступил запрос на добавление жанра " + genreId + " к фильму " + filmId);
         Film film =  genreService.addGenreToFilm(filmId, genreId);
         log.info("Жанр добавлен к фильму");
         return film;
